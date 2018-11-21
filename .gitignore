@@ -1,0 +1,5 @@
+*.*
+!gons3.go
+!go.mod
+!go.sum
+!.gitignore
