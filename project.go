@@ -20,8 +20,8 @@ type ProjectVariables struct {
 	Value string `json:"value"`
 }
 
-// ProjectInstance models an instance of a GNS3 project.
-type ProjectInstance struct {
+// Project models an instance of a GNS3 project.
+type Project struct {
 	Name                string              `json:"name"`
 	ProjectID           string              `json:"project_id"`
 	Path                string              `json:"path"`
@@ -43,38 +43,38 @@ type ProjectInstance struct {
 }
 
 // CreateProject creates a GNS3 project with the specified name.
-func CreateProject(t Transport, p ProjectCreator) (ProjectInstance, error) {
+func CreateProject(t Transport, p ProjectCreator) (Project, error) {
 	if p.values == nil {
-		return ProjectInstance{}, errors.New("failed to create project: missing project name")
+		return Project{}, errors.New("failed to create project: missing project name")
 	}
 	if name, ok := p.values["name"]; !ok || name == "" {
-		return ProjectInstance{}, errors.New("failed to create project: invalid project name")
+		return Project{}, errors.New("failed to create project: invalid project name")
 	}
 
 	u := "/v2/projects"
-	i := ProjectInstance{}
+	i := Project{}
 	_, err := t.Post(u, p.values, &i)
 	if err != nil {
-		return ProjectInstance{}, fmt.Errorf("failed to create project: %v", err)
+		return Project{}, fmt.Errorf("failed to create project: %v", err)
 	}
 
 	return i, nil
 }
 
 // UpdateProject creates a GNS3 project with the specified name.
-func UpdateProject(t Transport, id string, p ProjectUpdater) (ProjectInstance, error) {
+func UpdateProject(t Transport, id string, p ProjectUpdater) (Project, error) {
 	if p.values == nil {
-		return ProjectInstance{}, errors.New("failed to update project: nothing to update")
+		return Project{}, errors.New("failed to update project: nothing to update")
 	}
 	if id == "" {
-		return ProjectInstance{}, errors.New("failed to update project: invalid project id")
+		return Project{}, errors.New("failed to update project: invalid project id")
 	}
 
 	u := "/v2/projects/" + url.PathEscape(id)
-	i := ProjectInstance{}
+	i := Project{}
 	_, err := t.Put(u, p.values, &i)
 	if err != nil {
-		return ProjectInstance{}, fmt.Errorf("failed to update project: %v", err)
+		return Project{}, fmt.Errorf("failed to update project: %v", err)
 	}
 
 	return i, nil
@@ -96,60 +96,60 @@ func DeleteProject(t Transport, id string) error {
 }
 
 // GetProject gets a GNS3 project instance with the specified id.
-func GetProject(t Transport, id string) (ProjectInstance, error) {
+func GetProject(t Transport, id string) (Project, error) {
 	if id == "" {
-		return ProjectInstance{}, errors.New("failed to get project: invalid project id")
+		return Project{}, errors.New("failed to get project: invalid project id")
 	}
 
 	u := "/v2/projects/" + url.PathEscape(id)
-	i := ProjectInstance{}
+	i := Project{}
 	_, err := t.Get(u, &i)
 	if err != nil {
-		return ProjectInstance{}, fmt.Errorf("failed to get project: %v", err)
+		return Project{}, fmt.Errorf("failed to get project: %v", err)
 	}
 
 	return i, nil
 }
 
 // GetProjects gets all the GNS3 projects.
-func GetProjects(t Transport) ([]ProjectInstance, error) {
+func GetProjects(t Transport) ([]Project, error) {
 	u := "/v2/projects"
-	i := []ProjectInstance{}
+	i := []Project{}
 	_, err := t.Get(u, &i)
 	if err != nil {
-		return []ProjectInstance{}, fmt.Errorf("failed to get projects: %v", err)
+		return []Project{}, fmt.Errorf("failed to get projects: %v", err)
 	}
 
 	return i, nil
 }
 
 // OpenProject opens the GNS3 project.
-func OpenProject(t Transport, id string) (ProjectInstance, error) {
+func OpenProject(t Transport, id string) (Project, error) {
 	if id == "" {
-		return ProjectInstance{}, errors.New("failed to open project: invalid project id")
+		return Project{}, errors.New("failed to open project: invalid project id")
 	}
 
 	u := "/v2/projects/" + url.PathEscape(id) + "/open"
-	i := ProjectInstance{}
+	i := Project{}
 	_, err := t.Post(u, nil, &i)
 	if err != nil {
-		return ProjectInstance{}, fmt.Errorf("failed to open project: %v", err)
+		return Project{}, fmt.Errorf("failed to open project: %v", err)
 	}
 
 	return i, nil
 }
 
 // CloseProject opens the GNS3 project.
-func CloseProject(t Transport, id string) (ProjectInstance, error) {
+func CloseProject(t Transport, id string) (Project, error) {
 	if id == "" {
-		return ProjectInstance{}, errors.New("failed to close project: invalid project id")
+		return Project{}, errors.New("failed to close project: invalid project id")
 	}
 
 	u := "/v2/projects/" + url.PathEscape(id) + "/close"
-	i := ProjectInstance{}
+	i := Project{}
 	_, err := t.Post(u, nil, &i)
 	if err != nil {
-		return ProjectInstance{}, fmt.Errorf("failed to close project: %v", err)
+		return Project{}, fmt.Errorf("failed to close project: %v", err)
 	}
 
 	return i, nil
