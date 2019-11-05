@@ -20,51 +20,12 @@ type ProjectVariables struct {
 	Value string `json:"value"`
 }
 
-// NewProject models a new GNS3 project.
-type NewProject struct {
-	Name                *string             `json:"name"`
-	Path                *string             `json:"path,omitempty"`
-	AutoClose           bool                `json:"auto_close,omitempty"`
-	ProjectID           *string             `json:"project_id,omitempty"`
-	SceneHeight         int                 `json:"scene_height,omitempty"`
-	SceneWidth          int                 `json:"scene_width,omitempty"`
-	Zoom                int                 `json:"zoom,omitempty"`
-	ShowLayers          bool                `json:"show_layers,omitempty"`
-	SnapToGrid          bool                `json:"snap_to_grid,omitempty"`
-	ShowGrid            bool                `json:"show_grid,omitempty"`
-	GridSize            int                 `json:"grid_size,omitempty"`
-	DrawingGridSize     int                 `json:"drawing_grid_size,omitempty"`
-	ShowInterfaceLabels bool                `json:"show_interface_labels,omitempty"`
-	Supplier            *ProjectSupplier    `json:"Supplier,omitempty"`
-	Variables           *[]ProjectVariables `json:"Variables,omitempty"`
-}
-
-// ProjectUpdate models an update to a GNS3 project.
-type ProjectUpdate struct {
-	Name                *string             `json:"name,omitempty"`
-	Path                *string             `json:"path,omitempty"`
-	AutoClose           bool                `json:"auto_close,omitempty"`
-	AutoOpen            bool                `json:"auto_open,omitempty"`
-	AutoStart           bool                `json:"auto_start,omitempty"`
-	SceneHeight         int                 `json:"scene_height,omitempty"`
-	SceneWidth          int                 `json:"scene_width,omitempty"`
-	Zoom                int                 `json:"zoom,omitempty"`
-	ShowLayers          bool                `json:"show_layers,omitempty"`
-	SnapToGrid          bool                `json:"snap_to_grid,omitempty"`
-	ShowGrid            bool                `json:"show_grid,omitempty"`
-	GridSize            int                 `json:"grid_size,omitempty"`
-	DrawingGridSize     int                 `json:"drawing_grid_size,omitempty"`
-	ShowInterfaceLabels bool                `json:"show_interface_labels,omitempty"`
-	Supplier            *ProjectSupplier    `json:"Supplier,omitempty"`
-	Variables           *[]ProjectVariables `json:"Variables,omitempty"`
-}
-
 // ProjectInstance models an instance of a GNS3 project.
 type ProjectInstance struct {
-	Name                *string             `json:"name"`
+	Name                string              `json:"name"`
 	ProjectID           string              `json:"project_id"`
-	Path                *string             `json:"path"`
-	Filename            *string             `json:"filename"`
+	Path                string              `json:"path"`
+	Filename            string              `json:"filename"`
 	Status              string              `json:"status"`
 	AutoClose           bool                `json:"auto_close"`
 	AutoOpen            bool                `json:"auto_open"`
@@ -76,21 +37,23 @@ type ProjectInstance struct {
 	SnapToGrid          bool                `json:"snap_to_grid"`
 	ShowGrid            bool                `json:"show_grid"`
 	GridSize            int                 `json:"grid_size"`
-	DrawingGridSize     int                 `json:"drawing_grid_size"`
 	ShowInterfaceLabels bool                `json:"show_interface_labels"`
 	Supplier            *ProjectSupplier    `json:"Supplier"`
 	Variables           *[]ProjectVariables `json:"Variables"`
 }
 
 // CreateProject creates a GNS3 project with the specified name.
-func CreateProject(t Transport, p NewProject) (ProjectInstance, error) {
-	if p.Name == nil || *p.Name == "" {
+func CreateProject(t Transport, p ProjectCreator) (ProjectInstance, error) {
+	if p.values == nil {
+		return ProjectInstance{}, errors.New("failed to create project: missing project name")
+	}
+	if name, ok := p.values["name"]; !ok || name == "" {
 		return ProjectInstance{}, errors.New("failed to create project: invalid project name")
 	}
 
 	u := "/v2/projects"
 	i := ProjectInstance{}
-	_, err := t.Post(u, p, &i)
+	_, err := t.Post(u, p.values, &i)
 	if err != nil {
 		return ProjectInstance{}, fmt.Errorf("failed to create project: %v", err)
 	}
@@ -99,14 +62,17 @@ func CreateProject(t Transport, p NewProject) (ProjectInstance, error) {
 }
 
 // UpdateProject creates a GNS3 project with the specified name.
-func UpdateProject(t Transport, id string, p ProjectUpdate) (ProjectInstance, error) {
+func UpdateProject(t Transport, id string, p ProjectUpdater) (ProjectInstance, error) {
+	if p.values == nil {
+		return ProjectInstance{}, errors.New("failed to update project: nothing to update")
+	}
 	if id == "" {
 		return ProjectInstance{}, errors.New("failed to update project: invalid project id")
 	}
 
 	u := "/v2/projects/" + url.PathEscape(id)
 	i := ProjectInstance{}
-	_, err := t.Put(u, p, &i)
+	_, err := t.Put(u, p.values, &i)
 	if err != nil {
 		return ProjectInstance{}, fmt.Errorf("failed to update project: %v", err)
 	}
@@ -115,19 +81,18 @@ func UpdateProject(t Transport, id string, p ProjectUpdate) (ProjectInstance, er
 }
 
 // DeleteProject deletes a GNS3 project instance with the specified id.
-func DeleteProject(t Transport, id string) (ProjectInstance, error) {
+func DeleteProject(t Transport, id string) error {
 	if id == "" {
-		return ProjectInstance{}, errors.New("failed to delete project: invalid project id")
+		return errors.New("failed to delete project: invalid project id")
 	}
 
 	u := "/v2/projects/" + url.PathEscape(id)
-	i := ProjectInstance{}
-	_, err := t.Delete(u, &i)
+	_, err := t.Delete(u, nil)
 	if err != nil {
-		return ProjectInstance{}, fmt.Errorf("failed to delete project: %v", err)
+		return fmt.Errorf("failed to delete project: %v", err)
 	}
 
-	return i, nil
+	return nil
 }
 
 // GetProject gets a GNS3 project instance with the specified id.
@@ -148,7 +113,7 @@ func GetProject(t Transport, id string) (ProjectInstance, error) {
 
 // GetProjects gets all the GNS3 projects.
 func GetProjects(t Transport) ([]ProjectInstance, error) {
-	u := "/v2/projects/"
+	u := "/v2/projects"
 	i := []ProjectInstance{}
 	_, err := t.Get(u, &i)
 	if err != nil {
@@ -156,4 +121,73 @@ func GetProjects(t Transport) ([]ProjectInstance, error) {
 	}
 
 	return i, nil
+}
+
+// OpenProject opens the GNS3 project.
+func OpenProject(t Transport, id string) (ProjectInstance, error) {
+	if id == "" {
+		return ProjectInstance{}, errors.New("failed to open project: invalid project id")
+	}
+
+	u := "/v2/projects/" + url.PathEscape(id) + "/open"
+	i := ProjectInstance{}
+	_, err := t.Post(u, nil, &i)
+	if err != nil {
+		return ProjectInstance{}, fmt.Errorf("failed to open project: %v", err)
+	}
+
+	return i, nil
+}
+
+// CloseProject opens the GNS3 project.
+func CloseProject(t Transport, id string) (ProjectInstance, error) {
+	if id == "" {
+		return ProjectInstance{}, errors.New("failed to close project: invalid project id")
+	}
+
+	u := "/v2/projects/" + url.PathEscape(id) + "/close"
+	i := ProjectInstance{}
+	_, err := t.Post(u, nil, &i)
+	if err != nil {
+		return ProjectInstance{}, fmt.Errorf("failed to close project: %v", err)
+	}
+
+	return i, nil
+}
+
+// ReadProjectFile reads a GNS3 project's file.
+func ReadProjectFile(t Transport, id string, path string) ([]byte, error) {
+	if id == "" {
+		return []byte{}, errors.New("failed to read project file: invalid project id")
+	}
+	if path == "" {
+		return []byte{}, errors.New("failed to read project file: invalid path")
+	}
+
+	u := "/v2/projects/" + url.PathEscape(id) + "/files/" + path
+	b := []byte{}
+	_, err := t.Get(u, &b)
+	if err != nil {
+		return []byte{}, fmt.Errorf("failed to close project: %v", err)
+	}
+
+	return b, nil
+}
+
+// WriteProjectFile writes a GNS3 project's file.
+func WriteProjectFile(t Transport, id string, path string, data []byte) error {
+	if id == "" {
+		return errors.New("failed to write project file: invalid project id")
+	}
+	if path == "" {
+		return errors.New("failed to write project file: invalid path")
+	}
+
+	u := "/v2/projects/" + url.PathEscape(id) + "/files/" + path
+	_, err := t.Post(u, &data, nil)
+	if err != nil {
+		return fmt.Errorf("failed to close project: %v", err)
+	}
+
+	return nil
 }
