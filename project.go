@@ -4,14 +4,14 @@ package gons3
 
 import (
 	"errors"
-	"fmt"
 	"net/url"
 )
 
-const jsonEncoding = "applicaton/json"
+// ErrEmptyID means that the project id cannot be empty.
+var ErrEmptyID = errors.New("id cannot be empty")
 
-// ErrInvalidResponse means there was an error reading or parsing the http resonse.
-var ErrInvalidResponse = errors.New("the response was could not be read or parsed")
+// ErrEmptyFilepath means that the filepath cannot be empty.
+var ErrEmptyFilepath = errors.New("filepath cannot be empty")
 
 // ProjectSupplier models a GNS3 Project's Supplier
 type ProjectSupplier struct {
@@ -52,7 +52,7 @@ func CreateProject(g GNS3Client, p ProjectCreator) (Project, error) {
 	path := "/v2/projects"
 	proj := Project{}
 	if err := post(g, path, 201, p.values, &proj); err != nil {
-		return Project{}, fmt.Errorf("http request failed: %w", err)
+		return Project{}, err
 	}
 	return proj, nil
 }
@@ -60,13 +60,13 @@ func CreateProject(g GNS3Client, p ProjectCreator) (Project, error) {
 // UpdateProject creates a GNS3 project with the specified name.
 func UpdateProject(g GNS3Client, id string, p ProjectUpdater) (Project, error) {
 	if id == "" {
-		return Project{}, errors.New("failed to update project: invalid project id")
+		return Project{}, ErrEmptyID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(id)
 	proj := Project{}
 	if err := put(g, path, 200, p.values, &proj); err != nil {
-		return Project{}, fmt.Errorf("failed to update project: %v", err)
+		return Project{}, err
 	}
 	return proj, nil
 }
@@ -74,12 +74,12 @@ func UpdateProject(g GNS3Client, id string, p ProjectUpdater) (Project, error) {
 // DeleteProject deletes a GNS3 project instance with the specified id.
 func DeleteProject(g GNS3Client, id string) error {
 	if id == "" {
-		return errors.New("failed to delete project: invalid project id")
+		return ErrEmptyID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(id)
 	if err := delete(g, path, 204, nil); err != nil {
-		return fmt.Errorf("failed to delete project: %v", err)
+		return err
 	}
 	return nil
 }
@@ -87,13 +87,13 @@ func DeleteProject(g GNS3Client, id string) error {
 // GetProject gets a GNS3 project instance with the specified id.
 func GetProject(g GNS3Client, id string) (Project, error) {
 	if id == "" {
-		return Project{}, errors.New("failed to get project: invalid project id")
+		return Project{}, ErrEmptyID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(id)
 	proj := Project{}
 	if err := get(g, path, 200, &proj); err != nil {
-		return Project{}, fmt.Errorf("failed to get project: %v", err)
+		return Project{}, err
 	}
 	return proj, nil
 }
@@ -103,7 +103,7 @@ func GetProjects(g GNS3Client) ([]Project, error) {
 	path := "/v2/projects"
 	proj := []Project{}
 	if err := get(g, path, 200, &proj); err != nil {
-		return []Project{}, fmt.Errorf("failed to get projects: %v", err)
+		return []Project{}, err
 	}
 	return proj, nil
 }
@@ -111,13 +111,13 @@ func GetProjects(g GNS3Client) ([]Project, error) {
 // OpenProject opens the GNS3 project.
 func OpenProject(g GNS3Client, id string) (Project, error) {
 	if id == "" {
-		return Project{}, errors.New("failed to open project: invalid project id")
+		return Project{}, ErrEmptyID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(id) + "/open"
 	proj := Project{}
 	if err := post(g, path, 201, nil, &proj); err != nil {
-		return Project{}, fmt.Errorf("failed to open project: %v", err)
+		return Project{}, err
 	}
 	return proj, nil
 }
@@ -125,13 +125,13 @@ func OpenProject(g GNS3Client, id string) (Project, error) {
 // CloseProject opens the GNS3 project.
 func CloseProject(g GNS3Client, id string) (Project, error) {
 	if id == "" {
-		return Project{}, errors.New("failed to close project: invalid project id")
+		return Project{}, ErrEmptyID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(id) + "/close"
 	proj := Project{}
 	if err := post(g, path, 204, nil, &proj); err != nil {
-		return Project{}, fmt.Errorf("failed to close project: %v", err)
+		return Project{}, err
 	}
 	return proj, nil
 }
@@ -139,16 +139,16 @@ func CloseProject(g GNS3Client, id string) (Project, error) {
 // ReadProjectFile reads a GNS3 project's file.
 func ReadProjectFile(g GNS3Client, id string, filepath string) ([]byte, error) {
 	if id == "" {
-		return []byte{}, errors.New("failed to read project file: invalid project id")
+		return []byte{}, ErrEmptyID
 	}
 	if filepath == "" {
-		return []byte{}, errors.New("failed to read project file: invalid path")
+		return []byte{}, ErrEmptyFilepath
 	}
 
 	path := "/v2/projects/" + url.PathEscape(id) + "/files/" + filepath
 	data := []byte{}
 	if err := get(g, path, 200, &data); err != nil {
-		return []byte{}, fmt.Errorf("failed to close project: %v", err)
+		return []byte{}, err
 	}
 	return data, nil
 }
@@ -156,15 +156,15 @@ func ReadProjectFile(g GNS3Client, id string, filepath string) ([]byte, error) {
 // WriteProjectFile writes a GNS3 project's file.
 func WriteProjectFile(g GNS3Client, id string, filepath string, data []byte) error {
 	if id == "" {
-		return errors.New("failed to write project file: invalid project id")
+		return ErrEmptyID
 	}
 	if filepath == "" {
-		return errors.New("failed to write project file: invalid path")
+		return ErrEmptyFilepath
 	}
 
 	path := "/v2/projects/" + url.PathEscape(id) + "/files/" + filepath
 	if err := post(g, path, 200, &data, nil); err != nil {
-		return fmt.Errorf("failed to close project: %v", err)
+		return err
 	}
 	return nil
 }

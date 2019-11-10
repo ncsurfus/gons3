@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 // GNS3HTTPClient represents a default GNS3 client and server.
@@ -44,69 +45,80 @@ type GNS3Client interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-func get(g GNS3Client, url string, status int, result interface{}) error {
-	return req(g, "GET", url, status, nil, result)
+func get(g GNS3Client, url string, expectedStatus int, result interface{}) error {
+	return req(g, "GET", url, expectedStatus, nil, result)
 }
 
-func delete(g GNS3Client, url string, status int, result interface{}) error {
-	return req(g, "DELETE", url, status, nil, result)
+func delete(g GNS3Client, url string, expectedStatus int, result interface{}) error {
+	return req(g, "DELETE", url, expectedStatus, nil, result)
 }
 
-func post(g GNS3Client, url string, status int, body, result interface{}) error {
-	return req(g, "POST", url, status, body, result)
+func post(g GNS3Client, url string, expectedStatus int, body, result interface{}) error {
+	return req(g, "POST", url, expectedStatus, body, result)
 }
 
-func put(g GNS3Client, url string, status int, body, result interface{}) error {
-	return req(g, "PUT", url, status, body, result)
+func put(g GNS3Client, url string, expectedStatus int, body, result interface{}) error {
+	return req(g, "PUT", url, expectedStatus, body, result)
 }
 
-func req(g GNS3Client, method, url string, status int, body, result interface{}) error {
+func req(g GNS3Client, method, url string, expectedStatus int, body, result interface{}) error {
 	// Handle empty body, bytes body, or Marshal body to JSON
 	var bodyReader *bytes.Reader
-	if bodyBytes, ok := body.([]byte); ok {
-		bodyReader = bytes.NewReader(bodyBytes)
-	} else if body != nil {
+	var contentType string
+	switch b := body.(type) {
+	case nil:
+		bodyReader = bytes.NewReader([]byte{})
+	case []byte:
+		bodyReader = bytes.NewReader(b)
+		contentType = "application/octet-stream"
+	default:
 		reqBody, err := json.Marshal(body)
 		if err != nil {
-			return fmt.Errorf("failed to marshal request body to json: %w", err)
+			return fmt.Errorf("failed to marshal body to json: %w", err)
 		}
 		bodyReader = bytes.NewReader(reqBody)
-	} else {
-		bodyReader = bytes.NewReader([]byte{})
+		contentType = "application/json"
 	}
 
 	// Create request
 	req, err := http.NewRequest(method, g.GetSchemeAuthority()+url, bodyReader)
+	if contentType != "" {
+		req.Header.Set("Content-Type", contentType)
+	}
 	defer req.Body.Close()
 	if err != nil {
-		return fmt.Errorf("failed to create http request: %w", err)
+		return fmt.Errorf("failed to create request: %w", err)
 	}
 
 	// Send request
 	resp, err := g.Do(req)
 	if err != nil {
-		return fmt.Errorf("http request failed: %w", err)
+		return fmt.Errorf("request failed: %w", err)
 	}
 	defer resp.Body.Close()
 
 	// Check status code and return the error if possible
-	if resp.StatusCode != status {
+	if resp.StatusCode != expectedStatus {
 		return newServerError(resp)
 	}
 
 	// Read body
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("failed to read http body: %w", err)
+		return fmt.Errorf("failed to read repsonse body: %w", err)
 	}
 
-	// Unmarshal body as bytes, as JSON, or nothing
-	if resultBytes, ok := result.(*[]byte); ok {
-		*resultBytes = respBody
-	} else if result != nil {
-		err = json.Unmarshal(respBody, &result)
-		if err != nil {
-			return fmt.Errorf("failed to unmarshal http body to json: %v", err)
+	// Read response
+	switch r := result.(type) {
+	case nil:
+	case *[]byte:
+		*r = respBody
+	default:
+		if !strings.Contains(resp.Header.Get("Content-Type"), "application/json") {
+			return fmt.Errorf("response was not JSON as expected")
+		}
+		if json.Unmarshal(respBody, &result); err != nil {
+			return fmt.Errorf("failed to unmarshal result to json: %v", err)
 		}
 	}
 
