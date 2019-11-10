@@ -1,8 +1,10 @@
 package gons3
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 )
@@ -73,17 +75,24 @@ func newServerError(resp *http.Response) ServerError {
 	// Handle non-JSON error messages
 	contentType := resp.Header.Get("Content-type")
 	if !strings.Contains(contentType, "application/json") {
-		return ServerError{
-			code: resp.StatusCode,
-		}
+		return ServerError{code: resp.StatusCode}
 	}
 
-	// Marshal usual GNS3 JSON error
-	// If it errors and message is empty, then ignore since we still get the error code
+	// Unmarshal response to GNS3 error handler
+	// If this errors we'll just show the status code, something has gone wrong!
+	// Read body, ignoring error
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return ServerError{code: resp.StatusCode}
+	}
+
+	// Unmarshal JSON, ignoring error
 	j := struct {
 		Message string `json:"message"`
 	}{}
-	jsonUnmarshal(resp.Body, &j)
+	if json.Unmarshal(respBody, &j) != nil {
+		return ServerError{code: resp.StatusCode}
+	}
 
 	// Ignore the schema message which is a rather large escaped JSON payload
 	if i := strings.Index(j.Message, " in schema"); i != -1 {

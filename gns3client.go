@@ -35,7 +35,7 @@ func (g GNS3HTTPClient) GetSchemeAuthority() string {
 // Do sends the HTTP request with the default or explicit *http.Client.
 func (g GNS3HTTPClient) Do(req *http.Request) (*http.Response, error) {
 	if g.Client == nil {
-		http.DefaultClient.Do(req)
+		return http.DefaultClient.Do(req)
 	}
 	return g.Client.Do(req)
 }
@@ -104,13 +104,13 @@ func req(g GNS3Client, method, url string, expectedStatus int, body, result inte
 
 	// Create request
 	req, err := http.NewRequest(method, g.GetSchemeAuthority()+url, bodyReader)
+	if err != nil {
+		return Wrap(ErrFailedToCreateRequest, err)
+	}
 	if contentType != "" {
 		req.Header.Set("Content-Type", contentType)
 	}
 	defer req.Body.Close()
-	if err != nil {
-		return Wrap(ErrFailedToCreateRequest, err)
-	}
 
 	// Send request
 	resp, err := g.Do(req)
