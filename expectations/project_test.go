@@ -52,3 +52,28 @@ func TestOpenCloseProject(t *testing.T) {
 		t.Fatal("Project was expected to be closed, but wasn't.")
 	}
 }
+
+func TestReadWriteProjectFile(t *testing.T) {
+	g := gons3.GNS3HTTPClient{}
+	c := gons3.ProjectCreator{}
+	c.SetName("TestReadWriteProjectFile")
+	ci, err := gons3.CreateProject(g, c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer gons3.DeleteProject(g, ci.ProjectID)
+
+	err = gons3.WriteProjectFile(g, ci.ProjectID, "testing", []byte("the test"))
+	if err != nil {
+		t.Fatal("Failed to write project file!")
+	}
+
+	data, err := gons3.ReadProjectFile(g, ci.ProjectID, "testing")
+	sdata := string(data)
+	if err != nil {
+		t.Fatal("Failed to read project file!")
+	}
+	if sdata != "the test" {
+		t.Fatal("Invalid data from project files!")
+	}
+}
