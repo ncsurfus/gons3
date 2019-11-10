@@ -1,4 +1,5 @@
 // https://github.com/GNS3/gns3-server/blob/2.2/gns3server/schemas/project.py
+// https://github.com/GNS3/gns3-server/blob/2.2/gns3server/handlers/api/controller/project_handler.py
 
 package gons3
 
@@ -58,12 +59,12 @@ func CreateProject(g GNS3Client, p ProjectCreator) (Project, error) {
 }
 
 // UpdateProject creates a GNS3 project with the specified name.
-func UpdateProject(g GNS3Client, id string, p ProjectUpdater) (Project, error) {
-	if id == "" {
+func UpdateProject(g GNS3Client, projectID string, p ProjectUpdater) (Project, error) {
+	if projectID == "" {
 		return Project{}, ErrEmptyID
 	}
 
-	path := "/v2/projects/" + url.PathEscape(id)
+	path := "/v2/projects/" + url.PathEscape(projectID)
 	proj := Project{}
 	if err := put(g, path, 200, p.values, &proj); err != nil {
 		return Project{}, err
@@ -72,12 +73,12 @@ func UpdateProject(g GNS3Client, id string, p ProjectUpdater) (Project, error) {
 }
 
 // DeleteProject deletes a GNS3 project instance with the specified id.
-func DeleteProject(g GNS3Client, id string) error {
-	if id == "" {
+func DeleteProject(g GNS3Client, projectID string) error {
+	if projectID == "" {
 		return ErrEmptyID
 	}
 
-	path := "/v2/projects/" + url.PathEscape(id)
+	path := "/v2/projects/" + url.PathEscape(projectID)
 	if err := delete(g, path, 204, nil); err != nil {
 		return err
 	}
@@ -85,12 +86,12 @@ func DeleteProject(g GNS3Client, id string) error {
 }
 
 // GetProject gets a GNS3 project instance with the specified id.
-func GetProject(g GNS3Client, id string) (Project, error) {
-	if id == "" {
+func GetProject(g GNS3Client, projectID string) (Project, error) {
+	if projectID == "" {
 		return Project{}, ErrEmptyID
 	}
 
-	path := "/v2/projects/" + url.PathEscape(id)
+	path := "/v2/projects/" + url.PathEscape(projectID)
 	proj := Project{}
 	if err := get(g, path, 200, &proj); err != nil {
 		return Project{}, err
@@ -109,12 +110,12 @@ func GetProjects(g GNS3Client) ([]Project, error) {
 }
 
 // OpenProject opens the GNS3 project.
-func OpenProject(g GNS3Client, id string) (Project, error) {
-	if id == "" {
+func OpenProject(g GNS3Client, projectID string) (Project, error) {
+	if projectID == "" {
 		return Project{}, ErrEmptyID
 	}
 
-	path := "/v2/projects/" + url.PathEscape(id) + "/open"
+	path := "/v2/projects/" + url.PathEscape(projectID) + "/open"
 	proj := Project{}
 	if err := post(g, path, 201, nil, &proj); err != nil {
 		return Project{}, err
@@ -123,12 +124,12 @@ func OpenProject(g GNS3Client, id string) (Project, error) {
 }
 
 // CloseProject opens the GNS3 project.
-func CloseProject(g GNS3Client, id string) (Project, error) {
-	if id == "" {
+func CloseProject(g GNS3Client, projectID string) (Project, error) {
+	if projectID == "" {
 		return Project{}, ErrEmptyID
 	}
 
-	path := "/v2/projects/" + url.PathEscape(id) + "/close"
+	path := "/v2/projects/" + url.PathEscape(projectID) + "/close"
 	proj := Project{}
 	if err := post(g, path, 204, nil, &proj); err != nil {
 		return Project{}, err
@@ -137,15 +138,15 @@ func CloseProject(g GNS3Client, id string) (Project, error) {
 }
 
 // ReadProjectFile reads a GNS3 project's file.
-func ReadProjectFile(g GNS3Client, id string, filepath string) ([]byte, error) {
-	if id == "" {
+func ReadProjectFile(g GNS3Client, projectID string, filepath string) ([]byte, error) {
+	if projectID == "" {
 		return []byte{}, ErrEmptyID
 	}
 	if filepath == "" {
 		return []byte{}, ErrEmptyFilepath
 	}
 
-	path := "/v2/projects/" + url.PathEscape(id) + "/files/" + filepath
+	path := "/v2/projects/" + url.PathEscape(projectID) + "/files/" + filepath
 	data := []byte{}
 	if err := get(g, path, 200, &data); err != nil {
 		return []byte{}, err
@@ -154,15 +155,15 @@ func ReadProjectFile(g GNS3Client, id string, filepath string) ([]byte, error) {
 }
 
 // WriteProjectFile writes a GNS3 project's file.
-func WriteProjectFile(g GNS3Client, id string, filepath string, data []byte) error {
-	if id == "" {
+func WriteProjectFile(g GNS3Client, projectID string, filepath string, data []byte) error {
+	if projectID == "" {
 		return ErrEmptyID
 	}
 	if filepath == "" {
 		return ErrEmptyFilepath
 	}
 
-	path := "/v2/projects/" + url.PathEscape(id) + "/files/" + filepath
+	path := "/v2/projects/" + url.PathEscape(projectID) + "/files/" + filepath
 	if err := post(g, path, 200, &data, nil); err != nil {
 		return err
 	}

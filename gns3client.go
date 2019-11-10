@@ -84,9 +84,10 @@ var ErrResponseNotJSON = errors.New("response was not json as expected")
 var ErrFailedToUnmarshalResponse = errors.New("failed to unmarshal response")
 
 func req(g GNS3Client, method, url string, expectedStatus int, body, result interface{}) error {
-	// Handle empty body, bytes body, or Marshal body to JSON
 	var bodyReader *bytes.Reader
 	var contentType string
+
+	// Handle empty body, bytes body, or Marshal body to JSON
 	switch b := body.(type) {
 	case nil:
 		bodyReader = bytes.NewReader([]byte{})

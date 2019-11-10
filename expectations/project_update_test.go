@@ -19,6 +19,7 @@ func TestUpdateProject_A(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer deleteProjectByName(g, "TestUpdateAA")
 
 	u := gons3.ProjectUpdater{}
 	u.SetName("TestUpdateAA")

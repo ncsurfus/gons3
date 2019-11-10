@@ -35,6 +35,7 @@ func TestCreateProject_A(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer deleteProjectByName(g, "TestCreateA")
 
 	if i.Name != "TestCreateA" {
 		t.Errorf("Expected name: %v, got %v", "TestCreateA", i.Name)
@@ -103,6 +104,7 @@ func TestCreateProject_B(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer deleteProjectByName(g, "TestCreateB")
 
 	if i.Name != "TestCreateB" {
 		t.Errorf("Expected name: %v, got %v", "TestCreateB", i.Name)
