@@ -1,7 +1,6 @@
 package expectations
 
 import (
-	"fmt"
 	"gons3"
 	"testing"
 )
@@ -41,11 +40,15 @@ func TestOpenCloseProject(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Print(ci)
+	if !ci.IsOpened() {
+		t.Fatal("Project was expected to be open, but wasn't.")
+	}
 
 	ci, err = gons3.CloseProject(g, ci.ProjectID)
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Print(ci)
+	if ci.IsOpened() {
+		t.Fatal("Project was expected to be closed, but wasn't.")
+	}
 }

@@ -48,6 +48,11 @@ type Project struct {
 	Variables           *[]ProjectVariables `json:"Variables"`
 }
 
+// IsOpened returns true if the project status is set to opened.
+func (proj Project) IsOpened() bool {
+	return proj.Status == "opened"
+}
+
 // CreateProject creates a GNS3 project with the specified name.
 func CreateProject(g GNS3Client, p ProjectCreator) (Project, error) {
 	path := "/v2/projects"
@@ -131,7 +136,7 @@ func CloseProject(g GNS3Client, projectID string) (Project, error) {
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/close"
 	proj := Project{}
-	if err := post(g, path, 204, nil, &proj); err != nil {
+	if err := post(g, path, 201, nil, &proj); err != nil {
 		return Project{}, err
 	}
 	return proj, nil
