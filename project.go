@@ -51,7 +51,7 @@ type Project struct {
 func CreateProject(g GNS3Client, p ProjectCreator) (Project, error) {
 	path := "/v2/projects"
 	proj := Project{}
-	if err := post(g, path, 201, p, &proj); err != nil {
+	if err := post(g, path, 201, p.values, &proj); err != nil {
 		return Project{}, fmt.Errorf("http request failed: %w", err)
 	}
 	return proj, nil

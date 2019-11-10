@@ -6,7 +6,7 @@ import (
 )
 
 func TestUpdateProject_A(t *testing.T) {
-	g := gons3.GNS3HTTPServer{Hostname: "127.0.0.1:3080"}
+	g := gons3.GNS3HTTPClient{}
 
 	err := deleteProjectByName(g, "TestUpdateA")
 	if err != nil {

@@ -6,7 +6,7 @@ import (
 )
 
 func TestCreateProject_A(t *testing.T) {
-	g := gons3.GNS3HTTPServer{Hostname: "127.0.0.1:3080"}
+	g := gons3.GNS3HTTPClient{}
 
 	err := deleteProjectByName(g, "TestCreateA")
 	if err != nil {
@@ -81,7 +81,7 @@ func TestCreateProject_A(t *testing.T) {
 }
 
 func TestCreateProject_B(t *testing.T) {
-	g := gons3.GNS3HTTPServer{Hostname: "127.0.0.1:3080"}
+	g := gons3.GNS3HTTPClient{}
 
 	err := deleteProjectByName(g, "TestCreateB")
 	if err != nil {
