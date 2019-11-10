@@ -214,12 +214,12 @@ func TestCreateProjectB(t *testing.T) {
 }
 
 
-func TestUpdateProject(t *testing.T) {
+func TestUpdateProjectA(t *testing.T) {
 	c := gons3.ProjectCreator{}
-	c.SetName("TestUpdate")
+	c.SetName("TestUpdateA")
 	ci, err := gons3.CreateProject(client, c)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("failed to create project: %v", err)
 	}
 	defer deleteProjectByName(client, "TestUpdateAA")
 
@@ -245,7 +245,7 @@ func TestUpdateProject(t *testing.T) {
 	})
 	i, err := gons3.UpdateProject(client, ci.ProjectID, u)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("failed to update project: %v", err)
 	}
 
 	if i.Name != "TestUpdateAA" {
@@ -295,5 +295,76 @@ func TestUpdateProject(t *testing.T) {
 	}
 	if variables := *i.Variables; variables[0].Value != "Value1" {
 		t.Errorf("Expected variables: %v, got %v", "Value1", variables[0].Value)
+	}
+}
+
+func TestUpdateProjectB(t *testing.T) {
+	c := gons3.ProjectCreator{}
+	c.SetName("TestUpdateB")
+	ci, err := gons3.CreateProject(client, c)
+	if err != nil {
+		t.Fatalf("failed to create project: %v", err)
+	}
+	defer deleteProjectByName(client, "TestUpdateBB")
+
+	u := gons3.ProjectUpdater{}
+	u.SetName("TestUpdateBB")
+	u.SetAutoClose(false)
+	u.SetAutoOpen(false)
+	u.SetAutoStart(false)
+	u.SetSceneHeight(1750)
+	u.SetSceneWidth(850)
+	u.SetZoom(100)
+	u.SetShowLayers(false)
+	u.SetSnapToGrid(false)
+	u.SetShowGrid(false)
+	u.SetGridSize(20)
+	u.SetShowInterfaceLabels(false)
+	i, err := gons3.UpdateProject(client, ci.ProjectID, u)
+	if err != nil {
+		t.Fatalf("failed to update project: %v", err)
+	}
+
+	if i.Name != "TestUpdateBB" {
+		t.Errorf("Expected name: %v, got %v", "TestUpdateAA", i.Name)
+	}
+	if i.AutoClose != false {
+		t.Errorf("Expected autoClose: %v, got %v", false, i.AutoClose)
+	}
+	if i.AutoOpen != false {
+		t.Errorf("Expected autoOpen: %v, got %v", false, i.AutoClose)
+	}
+	if i.AutoStart != false {
+		t.Errorf("Expected autoStart: %v, got %v", false, i.AutoClose)
+	}
+	if i.SceneHeight != 1750 {
+		t.Errorf("Expected sceneHeight: %v, got %v", 1750, i.SceneHeight)
+	}
+	if i.SceneWidth != 850 {
+		t.Errorf("Expected sceneWidth: %v, got %v", 850, i.SceneWidth)
+	}
+	if i.Zoom != 100 {
+		t.Errorf("Expected zoom: %v, got %v", 100, i.Zoom)
+	}
+	if i.ShowLayers != false {
+		t.Errorf("Expected showLayers: %v, got %v", false, i.ShowLayers)
+	}
+	if i.SnapToGrid != false {
+		t.Errorf("Expected snapToGrid: %v, got %v", false, i.SnapToGrid)
+	}
+	if i.ShowGrid != false {
+		t.Errorf("Expected showGrid: %v, got %v", false, i.ShowGrid)
+	}
+	if i.GridSize != 20 {
+		t.Errorf("Expected gridSize: %v, got %v", 20, i.GridSize)
+	}
+	if i.ShowInterfaceLabels != false {
+		t.Errorf("Expected showInterfaceLabels: %v, got %v", false, i.ShowInterfaceLabels)
+	}
+	if i.Supplier != nil {
+		t.Errorf("Expected supplier: %v, got %v", nil, i.Supplier)
+	}
+	if i.Variables != nil {
+		t.Errorf("Expected varaibles: %v, got %v", nil, i.Variables)
 	}
 }
