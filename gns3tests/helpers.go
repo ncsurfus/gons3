@@ -1,8 +1,10 @@
-package expectations
+package gns3tests
 
 import (
 	"gons3"
 )
+
+var client = gons3.GNS3HTTPClient{}
 
 func deleteProjectByName(g gons3.GNS3Client, name string) error {
 	pjs, err := gons3.GetProjects(g)

@@ -93,7 +93,7 @@ func req(g GNS3Client, method, url string, expectedStatus int, body, result inte
 		bodyReader = bytes.NewReader([]byte{})
 	case *[]byte:
 		bodyReader = bytes.NewReader(*b)
-		//contentType = "application/octet-stream"
+		contentType = "application/octet-stream"
 	default:
 		reqBody, err := json.Marshal(body)
 		if err != nil {
