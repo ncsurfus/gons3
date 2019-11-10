@@ -8,8 +8,8 @@ import (
 	"net/url"
 )
 
-// ErrEmptyID means that the project id cannot be empty.
-var ErrEmptyID = errors.New("id cannot be empty")
+// ErrEmptyProjectID means that the project id cannot be empty.
+var ErrEmptyProjectID = errors.New("projectID cannot be empty")
 
 // ErrEmptyFilepath means that the filepath cannot be empty.
 var ErrEmptyFilepath = errors.New("filepath cannot be empty")
@@ -66,7 +66,7 @@ func CreateProject(g GNS3Client, p ProjectCreator) (Project, error) {
 // UpdateProject creates a GNS3 project with the specified name.
 func UpdateProject(g GNS3Client, projectID string, p ProjectUpdater) (Project, error) {
 	if projectID == "" {
-		return Project{}, ErrEmptyID
+		return Project{}, ErrEmptyProjectID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID)
@@ -80,7 +80,7 @@ func UpdateProject(g GNS3Client, projectID string, p ProjectUpdater) (Project, e
 // DeleteProject deletes a GNS3 project instance with the specified id.
 func DeleteProject(g GNS3Client, projectID string) error {
 	if projectID == "" {
-		return ErrEmptyID
+		return ErrEmptyProjectID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID)
@@ -93,7 +93,7 @@ func DeleteProject(g GNS3Client, projectID string) error {
 // GetProject gets a GNS3 project instance with the specified id.
 func GetProject(g GNS3Client, projectID string) (Project, error) {
 	if projectID == "" {
-		return Project{}, ErrEmptyID
+		return Project{}, ErrEmptyProjectID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID)
@@ -117,7 +117,7 @@ func GetProjects(g GNS3Client) ([]Project, error) {
 // OpenProject opens the GNS3 project.
 func OpenProject(g GNS3Client, projectID string) (Project, error) {
 	if projectID == "" {
-		return Project{}, ErrEmptyID
+		return Project{}, ErrEmptyProjectID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/open"
@@ -131,7 +131,7 @@ func OpenProject(g GNS3Client, projectID string) (Project, error) {
 // CloseProject opens the GNS3 project.
 func CloseProject(g GNS3Client, projectID string) (Project, error) {
 	if projectID == "" {
-		return Project{}, ErrEmptyID
+		return Project{}, ErrEmptyProjectID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/close"
@@ -145,7 +145,7 @@ func CloseProject(g GNS3Client, projectID string) (Project, error) {
 // ReadProjectFile reads a GNS3 project's file.
 func ReadProjectFile(g GNS3Client, projectID string, filepath string) ([]byte, error) {
 	if projectID == "" {
-		return []byte{}, ErrEmptyID
+		return []byte{}, ErrEmptyProjectID
 	}
 	if filepath == "" {
 		return []byte{}, ErrEmptyFilepath
@@ -162,7 +162,7 @@ func ReadProjectFile(g GNS3Client, projectID string, filepath string) ([]byte, e
 // WriteProjectFile writes a GNS3 project's file.
 func WriteProjectFile(g GNS3Client, projectID string, filepath string, data []byte) error {
 	if projectID == "" {
-		return ErrEmptyID
+		return ErrEmptyProjectID
 	}
 	if filepath == "" {
 		return ErrEmptyFilepath
