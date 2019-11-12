@@ -54,23 +54,6 @@ type NodePort struct {
 	MACAddress    string                 `json:"mac_address"`
 }
 
-// CustomAdapter models a GNS3 custom adapter.
-type CustomAdapter struct {
-	AdapterNumber int    `json:"adapter_number"`
-	PortName      string `json:"port_name"`
-	AdapterType   string `json:"adapter_type"`
-	MACAddress    string `json:"mac_address"`
-}
-
-// Label models a GNS3 label.
-type Label struct {
-	Text     string `json:"text"`
-	Style    string `json:"style"`
-	X        int    `json:"x"`
-	Y        int    `json:"y"`
-	Rotation int    `json:"rotation"`
-}
-
 // CreateNode creates a GNS3 node with the specified name.
 func CreateNode(g GNS3Client, projectID string, n NodeCreator) (Node, error) {
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes"
@@ -163,4 +146,73 @@ func (n *NodeCreator) SetComputeID(id string) {
 // SetLocalComputeID sets the compute_id to local for the new node.
 func (n *NodeCreator) SetLocalComputeID() {
 	n.SetProperty("compute_id", "local")
+}
+
+// SetConsole sets the console port to the node.
+func (n *NodeCreator) SetConsole(port int) {
+	n.SetProperty("console", port)
+}
+
+// SetConsoleType sets the type of console to use the node.
+// vnc, telnet, http, https, spice, spice+agent, none
+// ConsoleType is not applicable to the following node types and will be ignored.
+//   cloud, nat, ethernet_hub, frame_relay_switch, atm_switch
+//   https://github.com/GNS3/gns3-server/blob/2.2/gns3server/controller/node.py#L476
+func (n *NodeCreator) SetConsoleType(consoleType string) {
+	n.SetProperty("console_type", consoleType)
+}
+
+// SetConsoleAutoStart sets if the console should automatically be started.
+func (n *NodeCreator) SetConsoleAutoStart(autoStart bool) {
+	n.SetProperty("console_auto_start", autoStart)
+}
+
+// SetSymbol sets the symbol of the node.
+func (n *NodeCreator) SetSymbol(symbol string) {
+	n.SetProperty("symbol", symbol)
+}
+
+// SetLabel sets the label of the node.
+func (n *NodeCreator) SetLabel(label LabelCreator) {
+	n.SetProperty("label", label.values)
+}
+
+// SetX sets the X position of the node.
+func (n *NodeCreator) SetX(x int) {
+	n.SetProperty("x", x)
+}
+
+// SetY sets the Y position of the node.
+func (n *NodeCreator) SetY(y int) {
+	n.SetProperty("y", y)
+}
+
+// SetZ sets the Z position of the node.
+func (n *NodeCreator) SetZ(z int) {
+	n.SetProperty("z", z)
+}
+
+// SetLocked sets if the node is locked or not.
+func (n *NodeCreator) SetLocked(locked bool) {
+	n.SetProperty("locked", locked)
+}
+
+// SetPortNameFormat sets if the format for the port name. {0} gets replaced with the port number.
+func (n *NodeCreator) SetPortNameFormat(format string) {
+	n.SetProperty("port_name_format", format)
+}
+
+// SetPortSegmentSize sets if the size of the port segment.
+func (n *NodeCreator) SetPortSegmentSize(size int) {
+	n.SetProperty("port_segment_size", size)
+}
+
+// SetFirstPortName sets the name of the first port.
+func (n *NodeCreator) SetFirstPortName(name string) {
+	n.SetProperty("first_port_name", name)
+}
+
+// SetCustomAdapters sets the custom adapters on the node.
+func (n *NodeCreator) SetCustomAdapters(customAdapterCreator CustomAdapterCreator) {
+	n.SetProperty("custom_adapters", customAdapterCreator.values)
 }
