@@ -33,7 +33,7 @@ func (e WrappedError) Is(err error) bool {
 
 // As implements "errors.As" for the current and wrapped errors.
 func (e WrappedError) As(err error, target interface{}) bool {
-	return errors.As(err, e.Current)
+	return errors.As(err, &e.Current)
 }
 
 // Wrap wraps the errors so the first wraps the second, and the second wraps the third, etc..
