@@ -54,6 +54,21 @@ type NodePort struct {
 	MACAddress    string                 `json:"mac_address"`
 }
 
+// IsStarted returns true if the node is started, or false if the node is stopped/suspended.
+func (n Node) IsStarted() bool {
+	return n.Status == "started"
+}
+
+// IsSuspended returns true if the node is suspended, or false if the node is started/stopped.
+func (n Node) IsSuspended() bool {
+	return n.Status == "suspended"
+}
+
+// IsStopped returns true if the node is stopped, or false if the node is started/suspended.
+func (n Node) IsStopped() bool {
+	return n.Status == "stopped"
+}
+
 // CreateNode creates a GNS3 node.
 func CreateNode(g GNS3Client, projectID string, n NodeCreator) (Node, error) {
 	if projectID == "" {
@@ -128,6 +143,126 @@ func DeleteNode(g GNS3Client, projectID string, nodeID string) error {
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/" + url.PathEscape(nodeID)
 	if err := delete(g, path, 204, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+// StartNode starts a node in a GNS3 project
+func StartNode(g GNS3Client, projectID string, nodeID string) (Node, error) {
+	if projectID == "" {
+		return Node{}, ErrEmptyProjectID
+	}
+	if nodeID == "" {
+		return Node{}, ErrEmptyNodeID
+	}
+
+	node := Node{}
+	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/" + url.PathEscape(nodeID) + "/start"
+	if err := post(g, path, 200, nil, &node); err != nil {
+		return Node{}, err
+	}
+	return node, nil
+}
+
+// StartNodes starts all nodes in a GNS3 project
+func StartNodes(g GNS3Client, projectID string) error {
+	if projectID == "" {
+		return ErrEmptyProjectID
+	}
+
+	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/start"
+	if err := post(g, path, 204, nil, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+// StopNode stops a node in a GNS3 project
+func StopNode(g GNS3Client, projectID string, nodeID string) (Node, error) {
+	if projectID == "" {
+		return Node{}, ErrEmptyProjectID
+	}
+	if nodeID == "" {
+		return Node{}, ErrEmptyNodeID
+	}
+
+	node := Node{}
+	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/" + url.PathEscape(nodeID) + "/stop"
+	if err := post(g, path, 200, nil, &node); err != nil {
+		return Node{}, err
+	}
+	return node, nil
+}
+
+// StopNodes stops all nodes in a GNS3 project
+func StopNodes(g GNS3Client, projectID string) error {
+	if projectID == "" {
+		return ErrEmptyProjectID
+	}
+
+	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/stop"
+	if err := post(g, path, 204, nil, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+// SuspendNode suspends a node in a GNS3 project
+func SuspendNode(g GNS3Client, projectID string, nodeID string) (Node, error) {
+	if projectID == "" {
+		return Node{}, ErrEmptyProjectID
+	}
+	if nodeID == "" {
+		return Node{}, ErrEmptyNodeID
+	}
+
+	node := Node{}
+	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/" + url.PathEscape(nodeID) + "/suspend"
+	if err := post(g, path, 200, nil, &node); err != nil {
+		return Node{}, err
+	}
+	return node, nil
+}
+
+// SuspendNodes suspends all nodes in a GNS3 project
+func SuspendNodes(g GNS3Client, projectID string) error {
+	if projectID == "" {
+		return ErrEmptyProjectID
+	}
+
+	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/suspend"
+	if err := post(g, path, 204, nil, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+// ReloadNode reloads a node in a GNS3 project
+func ReloadNode(g GNS3Client, projectID string, nodeID string) (Node, error) {
+	if projectID == "" {
+		return Node{}, ErrEmptyProjectID
+	}
+	if nodeID == "" {
+		return Node{}, ErrEmptyNodeID
+	}
+
+	node := Node{}
+	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/" + url.PathEscape(nodeID) + "/reload"
+	if err := post(g, path, 200, nil, &node); err != nil {
+		return Node{}, err
+	}
+	return node, nil
+}
+
+// ReloadNodes restarts all nodes in a GNS3 project
+func ReloadNodes(g GNS3Client, projectID string) error {
+	if projectID == "" {
+		return ErrEmptyProjectID
+	}
+
+	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/reload"
+	if err := post(g, path, 204, nil, nil); err != nil {
 		return err
 	}
 	return nil

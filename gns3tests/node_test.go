@@ -3,6 +3,7 @@ package gns3tests
 import (
 	"gons3"
 	"testing"
+	"time"
 )
 
 func TestDeleteNode(t *testing.T) {
@@ -361,5 +362,73 @@ func TestUpdateNode_B(t *testing.T) {
 	}
 	if node.FirstPortName != "Mgmt1" {
 		t.Errorf("Expected firstPortName: %v, got %v", "Mgmt1", node.FirstPortName)
+	}
+}
+
+func TestStartStopNode(t *testing.T) {
+	pc := gons3.ProjectCreator{}
+	pc.SetName("TestStartStopNode")
+	proj, err := gons3.CreateProject(client, pc)
+	if err != nil {
+		t.Fatalf("Error creating project: %v", err)
+	}
+	defer gons3.DeleteProject(client, proj.ProjectID)
+
+	nc := gons3.NodeCreator{}
+	nc.SetName("TheNode")
+	nc.SetNodeType("vpcs")
+	nc.SetLocalComputeID()
+	node, err := gons3.CreateNode(client, proj.ProjectID, nc)
+	if err != nil {
+		t.Fatalf("Error creating node: %v", err)
+	}
+	defer gons3.DeleteNode(client, proj.ProjectID, node.ProjectID)
+
+	node, err = gons3.StartNode(client, proj.ProjectID, node.NodeID)
+	if err != nil {
+		t.Fatalf("Error starting node: %v", err)
+	}
+	// Wait 1 second, 10 times to see if node started
+	for i := 0; i != 10; i++ {
+		node, err = gons3.GetNode(client, proj.ProjectID, node.NodeID)
+		if node.IsStarted() {
+			break
+		}
+		time.Sleep(time.Second * 1)
+	}
+	if !node.IsStarted() {
+		t.Fatalf("Node did not start: %v", node.Status)
+	}
+
+	node, err = gons3.SuspendNode(client, proj.ProjectID, node.NodeID)
+	if err != nil {
+		t.Fatalf("Error suspending node: %v", err)
+	}
+	// Wait 1 second, 10 times to see if node started
+	for i := 0; i != 10; i++ {
+		node, err = gons3.GetNode(client, proj.ProjectID, node.NodeID)
+		if node.IsSuspended() {
+			break
+		}
+		time.Sleep(time.Second * 1)
+	}
+	if !node.IsSuspended() {
+		t.Fatalf("Node did not suspend: %v", node.Status)
+	}
+
+	node, err = gons3.StopNode(client, proj.ProjectID, node.NodeID)
+	if err != nil {
+		t.Fatalf("Error stopping node: %v", err)
+	}
+	// Wait 1 second, 10 times to see if node started
+	for i := 0; i != 10; i++ {
+		node, err = gons3.GetNode(client, proj.ProjectID, node.NodeID)
+		if node.IsStopped() {
+			break
+		}
+		time.Sleep(time.Second * 1)
+	}
+	if !node.IsStopped() {
+		t.Fatalf("Node did not stop: %v", node.Status)
 	}
 }
