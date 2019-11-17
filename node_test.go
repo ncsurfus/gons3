@@ -47,7 +47,7 @@ func TestGetNodes(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error is invalid: %v", err)
 	}
-	if req.URL.String() != "/v2/projects/P1/nodes/N1" {
+	if req.URL.String() != "/v2/projects/P1/nodes" {
 		t.Errorf("URL is invalid: %v", req.URL)
 	}
 	if req.Method != "GET" {

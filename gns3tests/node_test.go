@@ -400,22 +400,6 @@ func TestStartStopNode(t *testing.T) {
 		t.Fatalf("Node did not start: %v", node.Status)
 	}
 
-	node, err = gons3.SuspendNode(client, proj.ProjectID, node.NodeID)
-	if err != nil {
-		t.Fatalf("Error suspending node: %v", err)
-	}
-	// Wait 1 second, 10 times to see if node started
-	for i := 0; i != 10; i++ {
-		node, err = gons3.GetNode(client, proj.ProjectID, node.NodeID)
-		if node.IsSuspended() {
-			break
-		}
-		time.Sleep(time.Second * 1)
-	}
-	if !node.IsSuspended() {
-		t.Fatalf("Node did not suspend: %v", node.Status)
-	}
-
 	node, err = gons3.StopNode(client, proj.ProjectID, node.NodeID)
 	if err != nil {
 		t.Fatalf("Error stopping node: %v", err)
@@ -430,5 +414,38 @@ func TestStartStopNode(t *testing.T) {
 	}
 	if !node.IsStopped() {
 		t.Fatalf("Node did not stop: %v", node.Status)
+	}
+}
+
+func TestReadWriteNodeFile(t *testing.T) {
+	pc := gons3.ProjectCreator{}
+	pc.SetName("TestWriteNodeFile")
+	proj, err := gons3.CreateProject(client, pc)
+	if err != nil {
+		t.Fatalf("Error creating project: %v", err)
+	}
+	defer gons3.DeleteProject(client, proj.ProjectID)
+
+	nc := gons3.NodeCreator{}
+	nc.SetName("TheNode")
+	nc.SetNodeType("vpcs")
+	nc.SetLocalComputeID()
+	node, err := gons3.CreateNode(client, proj.ProjectID, nc)
+	if err != nil {
+		t.Fatalf("Error creating node: %v", err)
+	}
+	defer gons3.DeleteNode(client, proj.ProjectID, node.ProjectID)
+
+	err = gons3.WriteNodeFile(client, proj.ProjectID, node.NodeID, "test.txt", []byte("Test123"))
+	if err != nil {
+		t.Fatalf("Error writing file: %v", err)
+	}
+
+	b, err := gons3.ReadNodeFile(client, proj.ProjectID, node.NodeID, "test.txt")
+	if err != nil {
+		t.Fatalf("Error reading file: %v", err)
+	}
+	if string(b) != "Test123" {
+		t.Fatalf("Invalid file data : %v", string(b))
 	}
 }
