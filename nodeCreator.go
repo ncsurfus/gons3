@@ -1,5 +1,19 @@
 package gons3
 
+// NodeCreator models a new GNS3 node.
+// GNS3 schema requires values: Name, NodeType, and ComputeID
+type NodeCreator struct {
+	values map[string]interface{}
+}
+
+// SetProperty sets a custom property and value for the node.
+func (n *NodeCreator) SetProperty(name string, value interface{}) {
+	if n.values == nil {
+		n.values = map[string]interface{}{}
+	}
+	n.values[name] = value
+}
+
 // SetName sets the name for the new node.
 func (n *NodeCreator) SetName(name string) {
 	n.SetProperty("name", name)

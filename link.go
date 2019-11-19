@@ -1,6 +1,12 @@
 package gons3
 
-import "net/url"
+import (
+	"errors"
+	"net/url"
+)
+
+// ErrEmptyLinkID means that the link id cannot be empty.
+var ErrEmptyLinkID = errors.New("linkID cannot be empty")
 
 // LinkNode models the node object within the GNS3 link.
 type LinkNode struct {
@@ -24,8 +30,8 @@ type Link struct {
 	LinkType         string                 `json:"link_type"`
 }
 
-// GetLinks gets the links associated with the GNS3 node.
-func GetLinks(g GNS3Client, projectID, nodeID string) ([]Link, error) {
+// GetNodeLinks gets the links associated with the GNS3 node.
+func GetNodeLinks(g GNS3Client, projectID, nodeID string) ([]Link, error) {
 	if projectID == "" {
 		return []Link{}, ErrEmptyProjectID
 	}
@@ -39,4 +45,65 @@ func GetLinks(g GNS3Client, projectID, nodeID string) ([]Link, error) {
 		return []Link{}, err
 	}
 	return link, nil
+}
+
+// GetLinks gets the links associated with the GNS3 project.
+func GetLinks(g GNS3Client, projectID string) ([]Link, error) {
+	if projectID == "" {
+		return []Link{}, ErrEmptyProjectID
+	}
+
+	path := "/v2/projects/" + url.PathEscape(projectID) + "/links"
+	link := []Link{}
+	if err := get(g, path, 200, &link); err != nil {
+		return []Link{}, err
+	}
+	return link, nil
+}
+
+// GetLink gets the link associated with the GNS3 project.
+func GetLink(g GNS3Client, projectID, linkID string) (Link, error) {
+	if projectID == "" {
+		return Link{}, ErrEmptyProjectID
+	}
+	if linkID == "" {
+		return Link{}, ErrEmptyLinkID
+	}
+
+	path := "/v2/projects/" + url.PathEscape(projectID) + "/links/" + url.PathEscape(linkID)
+	link := Link{}
+	if err := get(g, path, 200, &link); err != nil {
+		return Link{}, err
+	}
+	return link, nil
+}
+
+// CreateLink creates the link associated with the GNS3 project.
+func CreateLink(g GNS3Client, projectID string, l LinkCreator) (Link, error) {
+	if projectID == "" {
+		return Link{}, ErrEmptyProjectID
+	}
+
+	path := "/v2/projects/" + url.PathEscape(projectID) + "/links"
+	link := Link{}
+	if err := post(g, path, 201, l.values, &link); err != nil {
+		return Link{}, err
+	}
+	return link, nil
+}
+
+// DeleteLink deletes the link.
+func DeleteLink(g GNS3Client, projectID, linkID string) error {
+	if projectID == "" {
+		return ErrEmptyProjectID
+	}
+	if linkID == "" {
+		return ErrEmptyLinkID
+	}
+
+	path := "/v2/projects/" + url.PathEscape(projectID) + "/links/" + url.PathEscape(linkID)
+	if err := delete(g, path, 204, nil); err != nil {
+		return err
+	}
+	return nil
 }

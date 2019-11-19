@@ -268,20 +268,6 @@ func ReloadNodes(g GNS3Client, projectID string) error {
 	return nil
 }
 
-// NodeCreator models a new GNS3 node.
-// GNS3 schema requires values: Name, NodeType, and ComputeID
-type NodeCreator struct {
-	values map[string]interface{}
-}
-
-// SetProperty sets a custom property and value for the node.
-func (n *NodeCreator) SetProperty(name string, value interface{}) {
-	if n.values == nil {
-		n.values = map[string]interface{}{}
-	}
-	n.values[name] = value
-}
-
 // ReadNodeFile reads a GNS3 node's file.
 func ReadNodeFile(g GNS3Client, projectID, nodeID, filepath string) ([]byte, error) {
 	if projectID == "" {
