@@ -54,7 +54,7 @@ func (proj Project) IsOpened() bool {
 }
 
 // CreateProject creates a GNS3 project with the specified name.
-func CreateProject(g GNS3Client, p ProjectCreator) (Project, error) {
+func CreateProject(g GNS3Client, p ProjectCreate) (Project, error) {
 	path := "/v2/projects"
 	proj := Project{}
 	if err := post(g, path, 201, p.values, &proj); err != nil {
@@ -64,7 +64,7 @@ func CreateProject(g GNS3Client, p ProjectCreator) (Project, error) {
 }
 
 // UpdateProject creates a GNS3 project with the specified name.
-func UpdateProject(g GNS3Client, projectID string, p ProjectUpdater) (Project, error) {
+func UpdateProject(g GNS3Client, projectID string, p ProjectUpdate) (Project, error) {
 	if projectID == "" {
 		return Project{}, ErrEmptyProjectID
 	}

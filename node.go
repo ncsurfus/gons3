@@ -70,7 +70,7 @@ func (n Node) IsStopped() bool {
 }
 
 // CreateNode creates a GNS3 node.
-func CreateNode(g GNS3Client, projectID string, n NodeCreator) (Node, error) {
+func CreateNode(g GNS3Client, projectID string, n NodeCreate) (Node, error) {
 	if projectID == "" {
 		return Node{}, ErrEmptyProjectID
 	}
@@ -84,7 +84,7 @@ func CreateNode(g GNS3Client, projectID string, n NodeCreator) (Node, error) {
 }
 
 // UpdateNode updates a GNS3 node.
-func UpdateNode(g GNS3Client, projectID, nodeID string, n NodeUpdater) (Node, error) {
+func UpdateNode(g GNS3Client, projectID, nodeID string, n NodeUpdate) (Node, error) {
 	if projectID == "" {
 		return Node{}, ErrEmptyProjectID
 	}

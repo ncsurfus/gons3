@@ -79,7 +79,7 @@ func GetLink(g GNS3Client, projectID, linkID string) (Link, error) {
 }
 
 // CreateLink creates the link associated with the GNS3 project.
-func CreateLink(g GNS3Client, projectID string, l LinkCreator) (Link, error) {
+func CreateLink(g GNS3Client, projectID string, l LinkCreate) (Link, error) {
 	if projectID == "" {
 		return Link{}, ErrEmptyProjectID
 	}
@@ -87,6 +87,23 @@ func CreateLink(g GNS3Client, projectID string, l LinkCreator) (Link, error) {
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/links"
 	link := Link{}
 	if err := post(g, path, 201, l.values, &link); err != nil {
+		return Link{}, err
+	}
+	return link, nil
+}
+
+// UpdateLink creates the link associated with the GNS3 project.
+func UpdateLink(g GNS3Client, projectID, linkID string, l LinkCreate) (Link, error) {
+	if projectID == "" {
+		return Link{}, ErrEmptyProjectID
+	}
+	if linkID == "" {
+		return Link{}, ErrEmptyLinkID
+	}
+
+	path := "/v2/projects/" + url.PathEscape(projectID) + "/links/" + url.PathEscape(linkID)
+	link := Link{}
+	if err := put(g, path, 201, l.values, &link); err != nil {
 		return Link{}, err
 	}
 	return link, nil
