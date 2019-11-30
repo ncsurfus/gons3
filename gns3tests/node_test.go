@@ -7,24 +7,24 @@ import (
 )
 
 func TestGetNode(t *testing.T) {
-	projectCreate := gons3.ProjectCreate{}
-	projectCreate.SetName("TestGetNode")
-	newProject, err := gons3.CreateProject(client, projectCreate)
+	projectBuilder := gons3.ProjectBuilder{}
+	projectBuilder.SetName("TestGetNode")
+	createdProject, err := gons3.CreateProject(client, projectBuilder)
 	if err != nil {
 		t.Fatalf("Error creating project: %v", err)
 	}
-	defer gons3.DeleteProject(client, newProject.ProjectID)
+	defer gons3.DeleteProject(client, createdProject.ProjectID)
 
-	nodeCreate := gons3.NodeCreate{}
-	nodeCreate.SetName("TheNode")
-	nodeCreate.SetNodeType("vpcs")
-	nodeCreate.SetLocalComputeID()
-	newNode, err := gons3.CreateNode(client, newProject.ProjectID, nodeCreate)
+	nodeBuilder := gons3.NodeBuilder{}
+	nodeBuilder.SetName("TheNode")
+	nodeBuilder.SetNodeType("vpcs")
+	nodeBuilder.SetLocalComputeID()
+	createdNode, err := gons3.CreateNode(client, createdProject.ProjectID, nodeBuilder)
 	if err != nil {
 		t.Fatalf("Error creating node: %v", err)
 	}
 
-	node, err := gons3.GetNode(client, newProject.ProjectID, newNode.NodeID)
+	node, err := gons3.GetNode(client, createdProject.ProjectID, createdNode.NodeID)
 	if err != nil {
 		t.Fatalf("Error getting node: %v", err)
 	}
@@ -34,33 +34,33 @@ func TestGetNode(t *testing.T) {
 }
 
 func TestGetNodes(t *testing.T) {
-	projectCreate := gons3.ProjectCreate{}
-	projectCreate.SetName("TestGetNodes")
-	newProject, err := gons3.CreateProject(client, projectCreate)
+	projectBuilder := gons3.ProjectBuilder{}
+	projectBuilder.SetName("TestGetNodes")
+	createdProject, err := gons3.CreateProject(client, projectBuilder)
 	if err != nil {
 		t.Fatalf("Error creating project: %v", err)
 	}
-	defer gons3.DeleteProject(client, newProject.ProjectID)
+	defer gons3.DeleteProject(client, createdProject.ProjectID)
 
-	nodeCreateA := gons3.NodeCreate{}
-	nodeCreateA.SetName("TheNodeA")
-	nodeCreateA.SetNodeType("vpcs")
-	nodeCreateA.SetLocalComputeID()
-	_, err = gons3.CreateNode(client, newProject.ProjectID, nodeCreateA)
+	nodeBuilderA := gons3.NodeBuilder{}
+	nodeBuilderA.SetName("TheNodeA")
+	nodeBuilderA.SetNodeType("vpcs")
+	nodeBuilderA.SetLocalComputeID()
+	_, err = gons3.CreateNode(client, createdProject.ProjectID, nodeBuilderA)
 	if err != nil {
 		t.Fatalf("Error creating node: %v", err)
 	}
 
-	nodeCreateB := gons3.NodeCreate{}
-	nodeCreateB.SetName("TheNodeA")
-	nodeCreateB.SetNodeType("vpcs")
-	nodeCreateB.SetLocalComputeID()
-	_, err = gons3.CreateNode(client, newProject.ProjectID, nodeCreateB)
+	nodeBuilderB := gons3.NodeBuilder{}
+	nodeBuilderB.SetName("TheNodeA")
+	nodeBuilderB.SetNodeType("vpcs")
+	nodeBuilderB.SetLocalComputeID()
+	_, err = gons3.CreateNode(client, createdProject.ProjectID, nodeBuilderB)
 	if err != nil {
 		t.Fatalf("Error creating node: %v", err)
 	}
 
-	nodes, err := gons3.GetNodes(client, newProject.ProjectID)
+	nodes, err := gons3.GetNodes(client, createdProject.ProjectID)
 	if err != nil {
 		t.Fatalf("Error getting nodes: %v", err)
 	}
@@ -70,7 +70,7 @@ func TestGetNodes(t *testing.T) {
 }
 
 func TestDeleteNode(t *testing.T) {
-	pc := gons3.ProjectCreate{}
+	pc := gons3.ProjectBuilder{}
 	pc.SetName("TestDeleteNode")
 	proj, err := gons3.CreateProject(client, pc)
 	if err != nil {
@@ -78,7 +78,7 @@ func TestDeleteNode(t *testing.T) {
 	}
 	defer gons3.DeleteProject(client, proj.ProjectID)
 
-	nc := gons3.NodeCreate{}
+	nc := gons3.NodeBuilder{}
 	nc.SetName("TheNode")
 	nc.SetNodeType("vpcs")
 	nc.SetLocalComputeID()
@@ -94,7 +94,7 @@ func TestDeleteNode(t *testing.T) {
 }
 
 func TestStartStopNode(t *testing.T) {
-	pc := gons3.ProjectCreate{}
+	pc := gons3.ProjectBuilder{}
 	pc.SetName("TestStartStopNode")
 	proj, err := gons3.CreateProject(client, pc)
 	if err != nil {
@@ -102,7 +102,7 @@ func TestStartStopNode(t *testing.T) {
 	}
 	defer gons3.DeleteProject(client, proj.ProjectID)
 
-	nc := gons3.NodeCreate{}
+	nc := gons3.NodeBuilder{}
 	nc.SetName("TheNode")
 	nc.SetNodeType("vpcs")
 	nc.SetLocalComputeID()
@@ -146,7 +146,7 @@ func TestStartStopNode(t *testing.T) {
 }
 
 func TestReadWriteNodeFile(t *testing.T) {
-	pc := gons3.ProjectCreate{}
+	pc := gons3.ProjectBuilder{}
 	pc.SetName("TestWriteNodeFile")
 	proj, err := gons3.CreateProject(client, pc)
 	if err != nil {
@@ -154,7 +154,7 @@ func TestReadWriteNodeFile(t *testing.T) {
 	}
 	defer gons3.DeleteProject(client, proj.ProjectID)
 
-	nc := gons3.NodeCreate{}
+	nc := gons3.NodeBuilder{}
 	nc.SetName("TheNode")
 	nc.SetNodeType("vpcs")
 	nc.SetLocalComputeID()

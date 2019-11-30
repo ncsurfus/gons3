@@ -1,12 +1,12 @@
 package gons3
 
-// LinkUpdate models an update to a GNS3 link between two or more nodes.
-type LinkUpdate struct {
+// LinkUpdater models an update to a GNS3 link between two or more nodes.
+type LinkUpdater struct {
 	values map[string]interface{}
 }
 
 // SetProperty sets a custom property and value for the node.
-func (n *LinkUpdate) SetProperty(name string, value interface{}) {
+func (n *LinkUpdater) SetProperty(name string, value interface{}) {
 	if n.values == nil {
 		n.values = map[string]interface{}{}
 	}
@@ -14,12 +14,12 @@ func (n *LinkUpdate) SetProperty(name string, value interface{}) {
 }
 
 // SetSuspend sets the suspended status of the link.
-func (n *LinkUpdate) SetSuspend(isSuspended bool) {
+func (n *LinkUpdater) SetSuspend(isSuspended bool) {
 	n.SetProperty("suspend", isSuspended)
 }
 
 // SetNodes sets the nodes that are a part of the link.
-func (n *LinkUpdate) SetNodes(linkNodes []LinkNodeCreate) {
+func (n *LinkUpdater) SetNodes(linkNodes []LinkNodeBuilder) {
 	nodes := make([]map[string]interface{}, len(linkNodes))
 	for i, linkNode := range linkNodes {
 		node := map[string]interface{}{}

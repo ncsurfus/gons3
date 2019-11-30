@@ -6,7 +6,7 @@ import (
 )
 
 func TestUpdateNode_A(t *testing.T) {
-	pc := gons3.ProjectCreate{}
+	pc := gons3.ProjectBuilder{}
 	pc.SetName("TestUpdateNode_A")
 	proj, err := gons3.CreateProject(client, pc)
 	if err != nil {
@@ -14,7 +14,7 @@ func TestUpdateNode_A(t *testing.T) {
 	}
 	defer gons3.DeleteProject(client, proj.ProjectID)
 
-	nc := gons3.NodeCreate{}
+	nc := gons3.NodeBuilder{}
 	nc.SetName("TheNode_A")
 	nc.SetNodeType("vpcs")
 	nc.SetLocalComputeID()
@@ -24,7 +24,7 @@ func TestUpdateNode_A(t *testing.T) {
 	}
 	defer gons3.DeleteNode(client, proj.ProjectID, node.ProjectID)
 
-	nu := gons3.NodeUpdate{}
+	nu := gons3.NodeUpdater{}
 	nu.SetName("TheNode")
 	nu.SetConsoleType("none")
 	nu.SetConsoleAutoStart(true)
@@ -87,7 +87,7 @@ func TestUpdateNode_A(t *testing.T) {
 }
 
 func TestUpdateNode_B(t *testing.T) {
-	pc := gons3.ProjectCreate{}
+	pc := gons3.ProjectBuilder{}
 	pc.SetName("TestUpdateNode_B")
 	proj, err := gons3.CreateProject(client, pc)
 	if err != nil {
@@ -95,7 +95,7 @@ func TestUpdateNode_B(t *testing.T) {
 	}
 	defer gons3.DeleteProject(client, proj.ProjectID)
 
-	nc := gons3.NodeCreate{}
+	nc := gons3.NodeBuilder{}
 	nc.SetName("TheNode_B")
 	nc.SetNodeType("ethernet_hub")
 	nc.SetLocalComputeID()
@@ -105,7 +105,7 @@ func TestUpdateNode_B(t *testing.T) {
 	}
 	defer gons3.DeleteNode(client, proj.ProjectID, node.ProjectID)
 
-	nu := gons3.NodeUpdate{}
+	nu := gons3.NodeUpdater{}
 	nu.SetConsoleType("none")
 	nu.SetConsoleAutoStart(false)
 	nu.SetX(8)

@@ -6,50 +6,50 @@ import (
 )
 
 func TestGetLink(t *testing.T) {
-	ProjectCreate := gons3.ProjectCreate{}
-	ProjectCreate.SetName("TestGetLink")
-	project, err := gons3.CreateProject(client, ProjectCreate)
+	ProjectBuilder := gons3.ProjectBuilder{}
+	ProjectBuilder.SetName("TestGetLink")
+	project, err := gons3.CreateProject(client, ProjectBuilder)
 	if err != nil {
 		fatalAssert(t, "CreateProject error", nil, err)
 	}
 	defer gons3.DeleteProject(client, project.ProjectID)
 
-	nodeCreateA := gons3.NodeCreate{}
-	nodeCreateA.SetName("TheNodeA")
-	nodeCreateA.SetNodeType("vpcs")
-	nodeCreateA.SetLocalComputeID()
-	nodeA, err := gons3.CreateNode(client, project.ProjectID, nodeCreateA)
+	nodeBuilderA := gons3.NodeBuilder{}
+	nodeBuilderA.SetName("TheNodeA")
+	nodeBuilderA.SetNodeType("vpcs")
+	nodeBuilderA.SetLocalComputeID()
+	nodeA, err := gons3.CreateNode(client, project.ProjectID, nodeBuilderA)
 	if err != nil {
 		fatalAssert(t, "CreateNode(A) error", nil, err)
 	}
 
-	nodeCreateB := gons3.NodeCreate{}
-	nodeCreateB.SetName("TheNodeB")
-	nodeCreateB.SetNodeType("vpcs")
-	nodeCreateB.SetLocalComputeID()
-	nodeB, err := gons3.CreateNode(client, project.ProjectID, nodeCreateB)
+	nodeBuilderB := gons3.NodeBuilder{}
+	nodeBuilderB.SetName("TheNodeB")
+	nodeBuilderB.SetNodeType("vpcs")
+	nodeBuilderB.SetLocalComputeID()
+	nodeB, err := gons3.CreateNode(client, project.ProjectID, nodeBuilderB)
 	if err != nil {
 		fatalAssert(t, "CreateNode(B) error", nil, err)
 	}
 
-	linkNodeCreateA := gons3.LinkNodeCreate{
+	LinkNodeBuilderA := gons3.LinkNodeBuilder{
 		NodeID:        nodeA.NodeID,
 		AdapterNumber: nodeA.Ports[0].AdapterNumber,
 		PortNumber:    nodeA.Ports[0].PortNumber,
 	}
-	linkNodeCreateB := gons3.LinkNodeCreate{
+	LinkNodeBuilderB := gons3.LinkNodeBuilder{
 		NodeID:        nodeB.NodeID,
 		AdapterNumber: nodeB.Ports[0].AdapterNumber,
 		PortNumber:    nodeB.Ports[0].PortNumber,
 	}
-	linkCreate := gons3.LinkCreate{}
-	linkCreate.SetNodes([]gons3.LinkNodeCreate{linkNodeCreateA, linkNodeCreateB})
-	newLink, err := gons3.CreateLink(client, project.ProjectID, linkCreate)
+	linkBuilder := gons3.LinkBuilder{}
+	linkBuilder.SetNodes([]gons3.LinkNodeBuilder{LinkNodeBuilderA, LinkNodeBuilderB})
+	createdLink, err := gons3.CreateLink(client, project.ProjectID, linkBuilder)
 	if err != nil {
 		fatalAssert(t, "CreateLink error", nil, err)
 	}
 
-	link, err := gons3.GetLink(client, project.ProjectID, newLink.LinkID)
+	link, err := gons3.GetLink(client, project.ProjectID, createdLink.LinkID)
 	if err != nil {
 		fatalAssert(t, "GetLink error", nil, err)
 	}
@@ -63,64 +63,64 @@ func TestGetLink(t *testing.T) {
 }
 
 func TestGetLinks(t *testing.T) {
-	ProjectCreate := gons3.ProjectCreate{}
-	ProjectCreate.SetName("TestGetLinks")
-	project, err := gons3.CreateProject(client, ProjectCreate)
+	ProjectBuilder := gons3.ProjectBuilder{}
+	ProjectBuilder.SetName("TestGetLinks")
+	project, err := gons3.CreateProject(client, ProjectBuilder)
 	if err != nil {
 		t.Fatalf("Error creating project: %v", err)
 	}
 	defer gons3.DeleteProject(client, project.ProjectID)
 
-	nodeCreateA := gons3.NodeCreate{}
-	nodeCreateA.SetName("TheNodeA")
-	nodeCreateA.SetNodeType("ethernet_switch")
-	nodeCreateA.SetConsoleType("none")
-	nodeCreateA.SetLocalComputeID()
-	nodeA, err := gons3.CreateNode(client, project.ProjectID, nodeCreateA)
+	nodeBuilderA := gons3.NodeBuilder{}
+	nodeBuilderA.SetName("TheNodeA")
+	nodeBuilderA.SetNodeType("ethernet_switch")
+	nodeBuilderA.SetConsoleType("none")
+	nodeBuilderA.SetLocalComputeID()
+	nodeA, err := gons3.CreateNode(client, project.ProjectID, nodeBuilderA)
 	if err != nil {
 		t.Fatalf("Error creating nodeA: %v", err)
 	}
 
-	nodeCreateB := gons3.NodeCreate{}
-	nodeCreateB.SetName("TheNodeB")
-	nodeCreateB.SetNodeType("ethernet_switch")
-	nodeCreateB.SetConsoleType("none")
-	nodeCreateB.SetLocalComputeID()
-	nodeB, err := gons3.CreateNode(client, project.ProjectID, nodeCreateB)
+	nodeBuilderB := gons3.NodeBuilder{}
+	nodeBuilderB.SetName("TheNodeB")
+	nodeBuilderB.SetNodeType("ethernet_switch")
+	nodeBuilderB.SetConsoleType("none")
+	nodeBuilderB.SetLocalComputeID()
+	nodeB, err := gons3.CreateNode(client, project.ProjectID, nodeBuilderB)
 	if err != nil {
 		t.Fatalf("Error creating nodeB: %v", err)
 	}
 
-	linkNodeCreateA := gons3.LinkNodeCreate{
+	LinkNodeBuilderA := gons3.LinkNodeBuilder{
 		NodeID:        nodeA.NodeID,
 		AdapterNumber: nodeA.Ports[0].AdapterNumber,
 		PortNumber:    nodeA.Ports[0].PortNumber,
 	}
-	linkNodeCreateB := gons3.LinkNodeCreate{
+	LinkNodeBuilderB := gons3.LinkNodeBuilder{
 		NodeID:        nodeB.NodeID,
 		AdapterNumber: nodeB.Ports[0].AdapterNumber,
 		PortNumber:    nodeB.Ports[0].PortNumber,
 	}
-	linkCreateA := gons3.LinkCreate{}
-	linkCreateA.SetNodes([]gons3.LinkNodeCreate{linkNodeCreateA, linkNodeCreateB})
-	newLinkA, err := gons3.CreateLink(client, project.ProjectID, linkCreateA)
+	linkBuilderA := gons3.LinkBuilder{}
+	linkBuilderA.SetNodes([]gons3.LinkNodeBuilder{LinkNodeBuilderA, LinkNodeBuilderB})
+	createdLinkA, err := gons3.CreateLink(client, project.ProjectID, linkBuilderA)
 	if err != nil {
 		t.Fatalf("Error creating linkA: %v", err)
 	}
 
-	linkNodeCreateC := gons3.LinkNodeCreate{
+	LinkNodeBuilderC := gons3.LinkNodeBuilder{
 		NodeID:        nodeA.NodeID,
 		AdapterNumber: nodeA.Ports[0].AdapterNumber,
 		PortNumber:    nodeA.Ports[1].PortNumber,
 	}
-	linkNodeCreateD := gons3.LinkNodeCreate{
+	LinkNodeBuilderD := gons3.LinkNodeBuilder{
 		NodeID:        nodeB.NodeID,
 		AdapterNumber: nodeB.Ports[0].AdapterNumber,
 		PortNumber:    nodeB.Ports[1].PortNumber,
 	}
-	linkCreateB := gons3.LinkCreate{}
-	linkCreateB.SetNodes([]gons3.LinkNodeCreate{linkNodeCreateC, linkNodeCreateD})
-	newLinkB, err := gons3.CreateLink(client, project.ProjectID, linkCreateB)
+	linkBuilderB := gons3.LinkBuilder{}
+	linkBuilderB.SetNodes([]gons3.LinkNodeBuilder{LinkNodeBuilderC, LinkNodeBuilderD})
+	createdLinkB, err := gons3.CreateLink(client, project.ProjectID, linkBuilderB)
 	if err != nil {
 		t.Fatalf("Error creating linkB: %v", err)
 	}
@@ -132,73 +132,73 @@ func TestGetLinks(t *testing.T) {
 	if len(link) != 2 {
 		t.Fatalf("Invalid link count: %v", len(link))
 	}
-	if link[0].LinkID != newLinkA.LinkID {
-		t.Errorf("Invalid link.0.linkID: %v", newLinkA.LinkID)
+	if link[0].LinkID != createdLinkA.LinkID {
+		t.Errorf("Invalid link.0.linkID: %v", createdLinkA.LinkID)
 	}
-	if link[1].LinkID != newLinkB.LinkID {
-		t.Errorf("Invalid link.1.linkID: %v", newLinkB.LinkID)
+	if link[1].LinkID != createdLinkB.LinkID {
+		t.Errorf("Invalid link.1.linkID: %v", createdLinkB.LinkID)
 	}
 }
 
 func TestGetNodeLinks(t *testing.T) {
-	ProjectCreate := gons3.ProjectCreate{}
-	ProjectCreate.SetName("TestGetNodeLinks")
-	project, err := gons3.CreateProject(client, ProjectCreate)
+	ProjectBuilder := gons3.ProjectBuilder{}
+	ProjectBuilder.SetName("TestGetNodeLinks")
+	project, err := gons3.CreateProject(client, ProjectBuilder)
 	if err != nil {
 		t.Fatalf("Error creating project: %v", err)
 	}
 	defer gons3.DeleteProject(client, project.ProjectID)
 
-	nodeCreateA := gons3.NodeCreate{}
-	nodeCreateA.SetName("TheNodeA")
-	nodeCreateA.SetNodeType("ethernet_switch")
-	nodeCreateA.SetConsoleType("none")
-	nodeCreateA.SetLocalComputeID()
-	nodeA, err := gons3.CreateNode(client, project.ProjectID, nodeCreateA)
+	nodeBuilderA := gons3.NodeBuilder{}
+	nodeBuilderA.SetName("TheNodeA")
+	nodeBuilderA.SetNodeType("ethernet_switch")
+	nodeBuilderA.SetConsoleType("none")
+	nodeBuilderA.SetLocalComputeID()
+	nodeA, err := gons3.CreateNode(client, project.ProjectID, nodeBuilderA)
 	if err != nil {
 		t.Fatalf("Error creating nodeA: %v", err)
 	}
 
-	nodeCreateB := gons3.NodeCreate{}
-	nodeCreateB.SetName("TheNodeB")
-	nodeCreateB.SetNodeType("ethernet_switch")
-	nodeCreateB.SetConsoleType("none")
-	nodeCreateB.SetLocalComputeID()
-	nodeB, err := gons3.CreateNode(client, project.ProjectID, nodeCreateB)
+	nodeBuilderB := gons3.NodeBuilder{}
+	nodeBuilderB.SetName("TheNodeB")
+	nodeBuilderB.SetNodeType("ethernet_switch")
+	nodeBuilderB.SetConsoleType("none")
+	nodeBuilderB.SetLocalComputeID()
+	nodeB, err := gons3.CreateNode(client, project.ProjectID, nodeBuilderB)
 	if err != nil {
 		t.Fatalf("Error creating nodeB: %v", err)
 	}
 
-	linkNodeCreateA := gons3.LinkNodeCreate{
+	LinkNodeBuilderA := gons3.LinkNodeBuilder{
 		NodeID:        nodeA.NodeID,
 		AdapterNumber: nodeA.Ports[0].AdapterNumber,
 		PortNumber:    nodeA.Ports[0].PortNumber,
 	}
-	linkNodeCreateB := gons3.LinkNodeCreate{
+	LinkNodeBuilderB := gons3.LinkNodeBuilder{
 		NodeID:        nodeB.NodeID,
 		AdapterNumber: nodeB.Ports[0].AdapterNumber,
 		PortNumber:    nodeB.Ports[0].PortNumber,
 	}
-	linkCreateA := gons3.LinkCreate{}
-	linkCreateA.SetNodes([]gons3.LinkNodeCreate{linkNodeCreateA, linkNodeCreateB})
-	newLinkA, err := gons3.CreateLink(client, project.ProjectID, linkCreateA)
+	linkBuilderA := gons3.LinkBuilder{}
+	linkBuilderA.SetNodes([]gons3.LinkNodeBuilder{LinkNodeBuilderA, LinkNodeBuilderB})
+	createdLinkA, err := gons3.CreateLink(client, project.ProjectID, linkBuilderA)
 	if err != nil {
 		t.Fatalf("Error creating linkA: %v", err)
 	}
 
-	linkNodeCreateC := gons3.LinkNodeCreate{
+	LinkNodeBuilderC := gons3.LinkNodeBuilder{
 		NodeID:        nodeA.NodeID,
 		AdapterNumber: nodeA.Ports[0].AdapterNumber,
 		PortNumber:    nodeA.Ports[1].PortNumber,
 	}
-	linkNodeCreateD := gons3.LinkNodeCreate{
+	LinkNodeBuilderD := gons3.LinkNodeBuilder{
 		NodeID:        nodeB.NodeID,
 		AdapterNumber: nodeB.Ports[0].AdapterNumber,
 		PortNumber:    nodeB.Ports[1].PortNumber,
 	}
-	linkCreateB := gons3.LinkCreate{}
-	linkCreateB.SetNodes([]gons3.LinkNodeCreate{linkNodeCreateC, linkNodeCreateD})
-	newLinkB, err := gons3.CreateLink(client, project.ProjectID, linkCreateB)
+	linkBuilderB := gons3.LinkBuilder{}
+	linkBuilderB.SetNodes([]gons3.LinkNodeBuilder{LinkNodeBuilderC, LinkNodeBuilderD})
+	createdLinkB, err := gons3.CreateLink(client, project.ProjectID, linkBuilderB)
 	if err != nil {
 		t.Fatalf("Error creating linkB: %v", err)
 	}
@@ -210,59 +210,59 @@ func TestGetNodeLinks(t *testing.T) {
 	if len(link) != 2 {
 		t.Fatalf("Invalid link count: %v", len(link))
 	}
-	if link[0].LinkID != newLinkA.LinkID {
-		t.Errorf("Invalid link.0.linkID: %v", newLinkA.LinkID)
+	if link[0].LinkID != createdLinkA.LinkID {
+		t.Errorf("Invalid link.0.linkID: %v", createdLinkA.LinkID)
 	}
-	if link[1].LinkID != newLinkB.LinkID {
-		t.Errorf("Invalid link.1.linkID: %v", newLinkB.LinkID)
+	if link[1].LinkID != createdLinkB.LinkID {
+		t.Errorf("Invalid link.1.linkID: %v", createdLinkB.LinkID)
 	}
 }
 
 func TestDeleteLink(t *testing.T) {
-	ProjectCreate := gons3.ProjectCreate{}
-	ProjectCreate.SetName("TestDeleteLink")
-	project, err := gons3.CreateProject(client, ProjectCreate)
+	ProjectBuilder := gons3.ProjectBuilder{}
+	ProjectBuilder.SetName("TestDeleteLink")
+	project, err := gons3.CreateProject(client, ProjectBuilder)
 	if err != nil {
 		t.Fatalf("Error creating project: %v", err)
 	}
 	defer gons3.DeleteProject(client, project.ProjectID)
 
-	nodeCreateA := gons3.NodeCreate{}
-	nodeCreateA.SetName("TheNodeA")
-	nodeCreateA.SetNodeType("vpcs")
-	nodeCreateA.SetLocalComputeID()
-	nodeA, err := gons3.CreateNode(client, project.ProjectID, nodeCreateA)
+	nodeBuilderA := gons3.NodeBuilder{}
+	nodeBuilderA.SetName("TheNodeA")
+	nodeBuilderA.SetNodeType("vpcs")
+	nodeBuilderA.SetLocalComputeID()
+	nodeA, err := gons3.CreateNode(client, project.ProjectID, nodeBuilderA)
 	if err != nil {
 		t.Fatalf("Error creating nodeA: %v", err)
 	}
 
-	nodeCreateB := gons3.NodeCreate{}
-	nodeCreateB.SetName("TheNodeB")
-	nodeCreateB.SetNodeType("vpcs")
-	nodeCreateB.SetLocalComputeID()
-	nodeB, err := gons3.CreateNode(client, project.ProjectID, nodeCreateB)
+	nodeBuilderB := gons3.NodeBuilder{}
+	nodeBuilderB.SetName("TheNodeB")
+	nodeBuilderB.SetNodeType("vpcs")
+	nodeBuilderB.SetLocalComputeID()
+	nodeB, err := gons3.CreateNode(client, project.ProjectID, nodeBuilderB)
 	if err != nil {
 		t.Fatalf("Error creating nodeB: %v", err)
 	}
 
-	linkNodeCreateA := gons3.LinkNodeCreate{
+	LinkNodeBuilderA := gons3.LinkNodeBuilder{
 		NodeID:        nodeA.NodeID,
 		AdapterNumber: nodeA.Ports[0].AdapterNumber,
 		PortNumber:    nodeA.Ports[0].PortNumber,
 	}
-	linkNodeCreateB := gons3.LinkNodeCreate{
+	LinkNodeBuilderB := gons3.LinkNodeBuilder{
 		NodeID:        nodeB.NodeID,
 		AdapterNumber: nodeB.Ports[0].AdapterNumber,
 		PortNumber:    nodeB.Ports[0].PortNumber,
 	}
-	linkCreate := gons3.LinkCreate{}
-	linkCreate.SetNodes([]gons3.LinkNodeCreate{linkNodeCreateA, linkNodeCreateB})
-	newLink, err := gons3.CreateLink(client, project.ProjectID, linkCreate)
+	linkBuilder := gons3.LinkBuilder{}
+	linkBuilder.SetNodes([]gons3.LinkNodeBuilder{LinkNodeBuilderA, LinkNodeBuilderB})
+	createdLink, err := gons3.CreateLink(client, project.ProjectID, linkBuilder)
 	if err != nil {
 		t.Fatalf("Error creating link: %v", err)
 	}
 
-	err = gons3.DeleteLink(client, project.ProjectID, newLink.LinkID)
+	err = gons3.DeleteLink(client, project.ProjectID, createdLink.LinkID)
 	if err != nil {
 		t.Fatalf("Error deleting link: %v", err)
 	}

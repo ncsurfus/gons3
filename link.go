@@ -31,7 +31,7 @@ type Link struct {
 }
 
 // GetNodeLinks gets the links associated with the GNS3 node.
-func GetNodeLinks(g GNS3Client, projectID, nodeID string) ([]Link, error) {
+func GetNodeLinks(client GNS3Client, projectID, nodeID string) ([]Link, error) {
 	if projectID == "" {
 		return []Link{}, ErrEmptyProjectID
 	}
@@ -41,28 +41,28 @@ func GetNodeLinks(g GNS3Client, projectID, nodeID string) ([]Link, error) {
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/" + url.PathEscape(nodeID) + "/links"
 	link := []Link{}
-	if err := get(g, path, 200, &link); err != nil {
+	if err := get(client, path, 200, &link); err != nil {
 		return []Link{}, err
 	}
 	return link, nil
 }
 
 // GetLinks gets the links associated with the GNS3 project.
-func GetLinks(g GNS3Client, projectID string) ([]Link, error) {
+func GetLinks(client GNS3Client, projectID string) ([]Link, error) {
 	if projectID == "" {
 		return []Link{}, ErrEmptyProjectID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/links"
 	link := []Link{}
-	if err := get(g, path, 200, &link); err != nil {
+	if err := get(client, path, 200, &link); err != nil {
 		return []Link{}, err
 	}
 	return link, nil
 }
 
 // GetLink gets the link associated with the GNS3 project.
-func GetLink(g GNS3Client, projectID, linkID string) (Link, error) {
+func GetLink(client GNS3Client, projectID, linkID string) (Link, error) {
 	if projectID == "" {
 		return Link{}, ErrEmptyProjectID
 	}
@@ -72,28 +72,28 @@ func GetLink(g GNS3Client, projectID, linkID string) (Link, error) {
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/links/" + url.PathEscape(linkID)
 	link := Link{}
-	if err := get(g, path, 200, &link); err != nil {
+	if err := get(client, path, 200, &link); err != nil {
 		return Link{}, err
 	}
 	return link, nil
 }
 
 // CreateLink creates the link associated with the GNS3 project.
-func CreateLink(g GNS3Client, projectID string, l LinkCreate) (Link, error) {
+func CreateLink(client GNS3Client, projectID string, linkBuilder LinkBuilder) (Link, error) {
 	if projectID == "" {
 		return Link{}, ErrEmptyProjectID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/links"
 	link := Link{}
-	if err := post(g, path, 201, l.values, &link); err != nil {
+	if err := post(client, path, 201, linkBuilder.values, &link); err != nil {
 		return Link{}, err
 	}
 	return link, nil
 }
 
 // UpdateLink creates the link associated with the GNS3 project.
-func UpdateLink(g GNS3Client, projectID, linkID string, l LinkCreate) (Link, error) {
+func UpdateLink(client GNS3Client, projectID, linkID string, linkUpdater LinkUpdater) (Link, error) {
 	if projectID == "" {
 		return Link{}, ErrEmptyProjectID
 	}
@@ -103,14 +103,14 @@ func UpdateLink(g GNS3Client, projectID, linkID string, l LinkCreate) (Link, err
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/links/" + url.PathEscape(linkID)
 	link := Link{}
-	if err := put(g, path, 201, l.values, &link); err != nil {
+	if err := put(client, path, 201, linkUpdater.values, &link); err != nil {
 		return Link{}, err
 	}
 	return link, nil
 }
 
 // DeleteLink deletes the link.
-func DeleteLink(g GNS3Client, projectID, linkID string) error {
+func DeleteLink(client GNS3Client, projectID, linkID string) error {
 	if projectID == "" {
 		return ErrEmptyProjectID
 	}
@@ -119,7 +119,7 @@ func DeleteLink(g GNS3Client, projectID, linkID string) error {
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/links/" + url.PathEscape(linkID)
-	if err := delete(g, path, 204, nil); err != nil {
+	if err := delete(client, path, 204, nil); err != nil {
 		return err
 	}
 	return nil

@@ -6,7 +6,7 @@ import (
 )
 
 func TestCreateProjectA(t *testing.T) {
-	p := gons3.ProjectCreate{}
+	p := gons3.ProjectBuilder{}
 	p.SetName("TestCreateA")
 	p.SetAutoClose(true)
 	p.SetSceneHeight(1800)
@@ -75,7 +75,7 @@ func TestCreateProjectA(t *testing.T) {
 }
 
 func TestCreateProjectB(t *testing.T) {
-	p := gons3.ProjectCreate{}
+	p := gons3.ProjectBuilder{}
 	p.SetName("TestCreateB")
 	p.SetAutoClose(false)
 	p.SetSceneHeight(1900)

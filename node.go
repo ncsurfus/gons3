@@ -55,36 +55,36 @@ type NodePort struct {
 }
 
 // IsStarted returns true if the node is started, or false if not started.
-func (n Node) IsStarted() bool {
-	return n.Status == "started"
+func (node Node) IsStarted() bool {
+	return node.Status == "started"
 }
 
 // IsSuspended returns true if the node is suspended, or false if not suspended.
-func (n Node) IsSuspended() bool {
-	return n.Status == "suspended"
+func (node Node) IsSuspended() bool {
+	return node.Status == "suspended"
 }
 
 // IsStopped returns true if the node is stopped, or false not stopped.
-func (n Node) IsStopped() bool {
-	return n.Status == "stopped"
+func (node Node) IsStopped() bool {
+	return node.Status == "stopped"
 }
 
 // CreateNode creates a GNS3 node.
-func CreateNode(g GNS3Client, projectID string, n NodeCreate) (Node, error) {
+func CreateNode(client GNS3Client, projectID string, nodeBuilder NodeBuilder) (Node, error) {
 	if projectID == "" {
 		return Node{}, ErrEmptyProjectID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes"
 	node := Node{}
-	if err := post(g, path, 201, n.values, &node); err != nil {
+	if err := post(client, path, 201, nodeBuilder.values, &node); err != nil {
 		return Node{}, err
 	}
 	return node, nil
 }
 
 // UpdateNode updates a GNS3 node.
-func UpdateNode(g GNS3Client, projectID, nodeID string, n NodeUpdate) (Node, error) {
+func UpdateNode(client GNS3Client, projectID, nodeID string, nodeBuilder NodeUpdater) (Node, error) {
 	if projectID == "" {
 		return Node{}, ErrEmptyProjectID
 	}
@@ -94,7 +94,7 @@ func UpdateNode(g GNS3Client, projectID, nodeID string, n NodeUpdate) (Node, err
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/" + url.PathEscape(nodeID)
 	node := Node{}
-	if err := put(g, path, 200, n.values, &node); err != nil {
+	if err := put(client, path, 200, nodeBuilder.values, &node); err != nil {
 		return Node{}, err
 	}
 
@@ -102,21 +102,21 @@ func UpdateNode(g GNS3Client, projectID, nodeID string, n NodeUpdate) (Node, err
 }
 
 // GetNodes gets all the nodes in the specified project
-func GetNodes(g GNS3Client, projectID string) ([]Node, error) {
+func GetNodes(client GNS3Client, projectID string) ([]Node, error) {
 	if projectID == "" {
 		return []Node{}, ErrEmptyProjectID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes"
 	node := []Node{}
-	if err := get(g, path, 200, &node); err != nil {
+	if err := get(client, path, 200, &node); err != nil {
 		return []Node{}, err
 	}
 	return node, nil
 }
 
 // GetNode gets a GNS3 node instance with the specified id.
-func GetNode(g GNS3Client, projectID, nodeID string) (Node, error) {
+func GetNode(client GNS3Client, projectID, nodeID string) (Node, error) {
 	if projectID == "" {
 		return Node{}, ErrEmptyProjectID
 	}
@@ -126,14 +126,14 @@ func GetNode(g GNS3Client, projectID, nodeID string) (Node, error) {
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/" + url.PathEscape(nodeID)
 	node := Node{}
-	if err := get(g, path, 200, &node); err != nil {
+	if err := get(client, path, 200, &node); err != nil {
 		return Node{}, err
 	}
 	return node, nil
 }
 
 // DeleteNode deletes a GNS3 node instance.
-func DeleteNode(g GNS3Client, projectID, nodeID string) error {
+func DeleteNode(client GNS3Client, projectID, nodeID string) error {
 	if projectID == "" {
 		return ErrEmptyProjectID
 	}
@@ -142,14 +142,14 @@ func DeleteNode(g GNS3Client, projectID, nodeID string) error {
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/" + url.PathEscape(nodeID)
-	if err := delete(g, path, 204, nil); err != nil {
+	if err := delete(client, path, 204, nil); err != nil {
 		return err
 	}
 	return nil
 }
 
 // StartNode starts a node in a GNS3 project
-func StartNode(g GNS3Client, projectID, nodeID string) (Node, error) {
+func StartNode(client GNS3Client, projectID, nodeID string) (Node, error) {
 	if projectID == "" {
 		return Node{}, ErrEmptyProjectID
 	}
@@ -159,27 +159,27 @@ func StartNode(g GNS3Client, projectID, nodeID string) (Node, error) {
 
 	node := Node{}
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/" + url.PathEscape(nodeID) + "/start"
-	if err := post(g, path, 200, nil, &node); err != nil {
+	if err := post(client, path, 200, nil, &node); err != nil {
 		return Node{}, err
 	}
 	return node, nil
 }
 
 // StartNodes starts all nodes in a GNS3 project
-func StartNodes(g GNS3Client, projectID string) error {
+func StartNodes(client GNS3Client, projectID string) error {
 	if projectID == "" {
 		return ErrEmptyProjectID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/start"
-	if err := post(g, path, 204, nil, nil); err != nil {
+	if err := post(client, path, 204, nil, nil); err != nil {
 		return err
 	}
 	return nil
 }
 
 // StopNode stops a node in a GNS3 project
-func StopNode(g GNS3Client, projectID, nodeID string) (Node, error) {
+func StopNode(client GNS3Client, projectID, nodeID string) (Node, error) {
 	if projectID == "" {
 		return Node{}, ErrEmptyProjectID
 	}
@@ -189,27 +189,27 @@ func StopNode(g GNS3Client, projectID, nodeID string) (Node, error) {
 
 	node := Node{}
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/" + url.PathEscape(nodeID) + "/stop"
-	if err := post(g, path, 200, nil, &node); err != nil {
+	if err := post(client, path, 200, nil, &node); err != nil {
 		return Node{}, err
 	}
 	return node, nil
 }
 
 // StopNodes stops all nodes in a GNS3 project
-func StopNodes(g GNS3Client, projectID string) error {
+func StopNodes(client GNS3Client, projectID string) error {
 	if projectID == "" {
 		return ErrEmptyProjectID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/stop"
-	if err := post(g, path, 204, nil, nil); err != nil {
+	if err := post(client, path, 204, nil, nil); err != nil {
 		return err
 	}
 	return nil
 }
 
 // SuspendNode suspends a node in a GNS3 project
-func SuspendNode(g GNS3Client, projectID, nodeID string) (Node, error) {
+func SuspendNode(client GNS3Client, projectID, nodeID string) (Node, error) {
 	if projectID == "" {
 		return Node{}, ErrEmptyProjectID
 	}
@@ -219,27 +219,27 @@ func SuspendNode(g GNS3Client, projectID, nodeID string) (Node, error) {
 
 	node := Node{}
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/" + url.PathEscape(nodeID) + "/suspend"
-	if err := post(g, path, 200, nil, &node); err != nil {
+	if err := post(client, path, 200, nil, &node); err != nil {
 		return Node{}, err
 	}
 	return node, nil
 }
 
 // SuspendNodes suspends all nodes in a GNS3 project
-func SuspendNodes(g GNS3Client, projectID string) error {
+func SuspendNodes(client GNS3Client, projectID string) error {
 	if projectID == "" {
 		return ErrEmptyProjectID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/suspend"
-	if err := post(g, path, 204, nil, nil); err != nil {
+	if err := post(client, path, 204, nil, nil); err != nil {
 		return err
 	}
 	return nil
 }
 
 // ReloadNode reloads a node in a GNS3 project
-func ReloadNode(g GNS3Client, projectID, nodeID string) (Node, error) {
+func ReloadNode(client GNS3Client, projectID, nodeID string) (Node, error) {
 	if projectID == "" {
 		return Node{}, ErrEmptyProjectID
 	}
@@ -249,27 +249,27 @@ func ReloadNode(g GNS3Client, projectID, nodeID string) (Node, error) {
 
 	node := Node{}
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/" + url.PathEscape(nodeID) + "/reload"
-	if err := post(g, path, 200, nil, &node); err != nil {
+	if err := post(client, path, 200, nil, &node); err != nil {
 		return Node{}, err
 	}
 	return node, nil
 }
 
 // ReloadNodes restarts all nodes in a GNS3 project
-func ReloadNodes(g GNS3Client, projectID string) error {
+func ReloadNodes(client GNS3Client, projectID string) error {
 	if projectID == "" {
 		return ErrEmptyProjectID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/reload"
-	if err := post(g, path, 204, nil, nil); err != nil {
+	if err := post(client, path, 204, nil, nil); err != nil {
 		return err
 	}
 	return nil
 }
 
 // ReadNodeFile reads a GNS3 node's file.
-func ReadNodeFile(g GNS3Client, projectID, nodeID, filepath string) ([]byte, error) {
+func ReadNodeFile(client GNS3Client, projectID, nodeID, filepath string) ([]byte, error) {
 	if projectID == "" {
 		return []byte{}, ErrEmptyProjectID
 	}
@@ -283,14 +283,14 @@ func ReadNodeFile(g GNS3Client, projectID, nodeID, filepath string) ([]byte, err
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/" + url.PathEscape(nodeID) +
 		"/files/" + filepath
 	data := []byte{}
-	if err := get(g, path, 200, &data); err != nil {
+	if err := get(client, path, 200, &data); err != nil {
 		return []byte{}, err
 	}
 	return data, nil
 }
 
 // WriteNodeFile writes a GNS3 node's file.
-func WriteNodeFile(g GNS3Client, projectID, nodeID, filepath string, data []byte) error {
+func WriteNodeFile(client GNS3Client, projectID, nodeID, filepath string, data []byte) error {
 	if projectID == "" {
 		return ErrEmptyProjectID
 	}
@@ -303,7 +303,7 @@ func WriteNodeFile(g GNS3Client, projectID, nodeID, filepath string, data []byte
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/" + url.PathEscape(nodeID) +
 		"/files/" + filepath
-	if err := post(g, path, 201, &data, nil); err != nil {
+	if err := post(client, path, 201, &data, nil); err != nil {
 		return err
 	}
 	return nil

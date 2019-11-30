@@ -6,15 +6,15 @@ import (
 )
 
 func TestGetProject(t *testing.T) {
-	projectCreate := gons3.ProjectCreate{}
-	projectCreate.SetName("TestGetProject")
-	newProject, err := gons3.CreateProject(client, projectCreate)
+	projectBuilder := gons3.ProjectBuilder{}
+	projectBuilder.SetName("TestGetProject")
+	createdProject, err := gons3.CreateProject(client, projectBuilder)
 	if err != nil {
 		t.Fatalf("Error creating project: %v", err)
 	}
-	defer gons3.DeleteProject(client, newProject.ProjectID)
+	defer gons3.DeleteProject(client, createdProject.ProjectID)
 
-	project, err := gons3.GetProject(client, newProject.ProjectID)
+	project, err := gons3.GetProject(client, createdProject.ProjectID)
 	if err != nil {
 		t.Fatalf("Error getting project: %v", err)
 	}
@@ -24,21 +24,21 @@ func TestGetProject(t *testing.T) {
 }
 
 func TestGetProjects(t *testing.T) {
-	projectCreateA := gons3.ProjectCreate{}
-	projectCreateA.SetName("TestGetProjectsA")
-	newProjectA, err := gons3.CreateProject(client, projectCreateA)
+	projectBuilderA := gons3.ProjectBuilder{}
+	projectBuilderA.SetName("TestGetProjectsA")
+	createdProjectA, err := gons3.CreateProject(client, projectBuilderA)
 	if err != nil {
 		t.Fatalf("Error creating project A: %v", err)
 	}
-	defer gons3.DeleteProject(client, newProjectA.ProjectID)
+	defer gons3.DeleteProject(client, createdProjectA.ProjectID)
 
-	projectCreateB := gons3.ProjectCreate{}
-	projectCreateB.SetName("TestGetProjectsB")
-	newProjectB, err := gons3.CreateProject(client, projectCreateB)
+	projectBuilderB := gons3.ProjectBuilder{}
+	projectBuilderB.SetName("TestGetProjectsB")
+	createdProjectB, err := gons3.CreateProject(client, projectBuilderB)
 	if err != nil {
 		t.Fatalf("Error creating project B: %v", err)
 	}
-	defer gons3.DeleteProject(client, newProjectB.ProjectID)
+	defer gons3.DeleteProject(client, createdProjectB.ProjectID)
 
 	projects, err := gons3.GetProjects(client)
 	if err != nil {
@@ -48,9 +48,9 @@ func TestGetProjects(t *testing.T) {
 	projectAFound, projectBFound := false, false
 	for _, project := range projects {
 		switch project.ProjectID {
-		case newProjectA.ProjectID:
+		case createdProjectA.ProjectID:
 			projectAFound = true
-		case newProjectB.ProjectID:
+		case createdProjectB.ProjectID:
 			projectBFound = true
 		}
 	}
@@ -63,7 +63,7 @@ func TestGetProjects(t *testing.T) {
 }
 
 func TestDeleteProject(t *testing.T) {
-	c := gons3.ProjectCreate{}
+	c := gons3.ProjectBuilder{}
 	c.SetName("TestDeleteProject")
 	ci, err := gons3.CreateProject(client, c)
 	if err != nil {
@@ -77,7 +77,7 @@ func TestDeleteProject(t *testing.T) {
 }
 
 func TestOpenCloseProject(t *testing.T) {
-	c := gons3.ProjectCreate{}
+	c := gons3.ProjectBuilder{}
 	c.SetName("TestOpenCloseProject")
 	ci, err := gons3.CreateProject(client, c)
 	if err != nil {
@@ -103,7 +103,7 @@ func TestOpenCloseProject(t *testing.T) {
 }
 
 func TestReadWriteProjectFile(t *testing.T) {
-	c := gons3.ProjectCreate{}
+	c := gons3.ProjectBuilder{}
 	c.SetName("TestReadWriteProjectFile")
 	ci, err := gons3.CreateProject(client, c)
 	if err != nil {

@@ -6,7 +6,7 @@ import (
 )
 
 func TestCreateNode_A(t *testing.T) {
-	pc := gons3.ProjectCreate{}
+	pc := gons3.ProjectBuilder{}
 	pc.SetName("TestCreateNode_A")
 	proj, err := gons3.CreateProject(client, pc)
 	if err != nil {
@@ -14,7 +14,7 @@ func TestCreateNode_A(t *testing.T) {
 	}
 	defer gons3.DeleteProject(client, proj.ProjectID)
 
-	nc := gons3.NodeCreate{}
+	nc := gons3.NodeBuilder{}
 	nc.SetName("TheNode_A")
 	nc.SetNodeType("vpcs")
 	nc.SetLocalComputeID()
@@ -86,7 +86,7 @@ func TestCreateNode_A(t *testing.T) {
 }
 
 func TestCreateNode_B(t *testing.T) {
-	pc := gons3.ProjectCreate{}
+	pc := gons3.ProjectBuilder{}
 	pc.SetName("TestCreateNode_B")
 	proj, err := gons3.CreateProject(client, pc)
 	if err != nil {
@@ -94,7 +94,7 @@ func TestCreateNode_B(t *testing.T) {
 	}
 	defer gons3.DeleteProject(client, proj.ProjectID)
 
-	nc := gons3.NodeCreate{}
+	nc := gons3.NodeBuilder{}
 	nc.SetName("TheNode_B")
 	nc.SetNodeType("ethernet_hub")
 	nc.SetLocalComputeID()

@@ -2,6 +2,7 @@ package gons3
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -16,28 +17,38 @@ type GNS3HTTPClient struct {
 	Scheme   string
 	Hostname string
 	Port     int
+	Context  context.Context
 }
 
 // GetSchemeAuthority gets the scheme and authority of the GNS3 server.
-func (g GNS3HTTPClient) GetSchemeAuthority() string {
-	if g.Scheme == "" {
-		g.Scheme = "http"
+func (client GNS3HTTPClient) GetSchemeAuthority() string {
+	if client.Scheme == "" {
+		client.Scheme = "http"
 	}
-	if g.Hostname == "" {
-		g.Hostname = "127.0.0.1"
+	if client.Hostname == "" {
+		client.Hostname = "127.0.0.1"
 	}
-	if g.Port == 0 {
-		g.Port = 3080
+	if client.Port == 0 {
+		client.Port = 3080
 	}
-	return fmt.Sprintf("%v://%v:%v", g.Scheme, g.Hostname, g.Port)
+	return fmt.Sprintf("%v://%v:%v", client.Scheme, client.Hostname, client.Port)
 }
 
 // Do sends the HTTP request with the default or explicit *http.Client.
-func (g GNS3HTTPClient) Do(req *http.Request) (*http.Response, error) {
-	if g.Client == nil {
+func (client GNS3HTTPClient) Do(req *http.Request) (*http.Response, error) {
+	if client.Context != nil {
+		req = req.WithContext(client.Context)
+	}
+	if client.Client == nil {
 		return http.DefaultClient.Do(req)
 	}
-	return g.Client.Do(req)
+	return client.Client.Do(req)
+}
+
+// WithContext returns the same GNS3HTTPClient but, with the context.
+func (client GNS3HTTPClient) WithContext(context context.Context) GNS3HTTPClient {
+	client.Context = context
+	return client
 }
 
 // GNS3Client provides an interface for creating custom GNS3 clients.
@@ -46,20 +57,20 @@ type GNS3Client interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-func get(g GNS3Client, url string, expectedStatus int, result interface{}) error {
-	return req(g, "GET", url, expectedStatus, nil, result)
+func get(client GNS3Client, url string, expectedStatus int, result interface{}) error {
+	return req(client, "GET", url, expectedStatus, nil, result)
 }
 
-func delete(g GNS3Client, url string, expectedStatus int, result interface{}) error {
-	return req(g, "DELETE", url, expectedStatus, nil, result)
+func delete(client GNS3Client, url string, expectedStatus int, result interface{}) error {
+	return req(client, "DELETE", url, expectedStatus, nil, result)
 }
 
-func post(g GNS3Client, url string, expectedStatus int, body, result interface{}) error {
-	return req(g, "POST", url, expectedStatus, body, result)
+func post(client GNS3Client, url string, expectedStatus int, body, result interface{}) error {
+	return req(client, "POST", url, expectedStatus, body, result)
 }
 
-func put(g GNS3Client, url string, expectedStatus int, body, result interface{}) error {
-	return req(g, "PUT", url, expectedStatus, body, result)
+func put(client GNS3Client, url string, expectedStatus int, body, result interface{}) error {
+	return req(client, "PUT", url, expectedStatus, body, result)
 }
 
 // ErrFailedToMarshalBodyToJSON is returned when the body could not be marshaled to JSON.
@@ -83,7 +94,7 @@ var ErrResponseNotJSON = errors.New("response was not json as expected")
 // ErrFailedToUnmarshalResponse is returned when the json response could not be unmarshled.
 var ErrFailedToUnmarshalResponse = errors.New("failed to unmarshal response")
 
-func req(g GNS3Client, method, url string, expectedStatus int, body, result interface{}) error {
+func req(client GNS3Client, method, url string, expectedStatus int, body, result interface{}) error {
 	var bodyReader *bytes.Reader
 	var contentType string
 
@@ -104,7 +115,7 @@ func req(g GNS3Client, method, url string, expectedStatus int, body, result inte
 	}
 
 	// Create request
-	req, err := http.NewRequest(method, g.GetSchemeAuthority()+url, bodyReader)
+	req, err := http.NewRequest(method, client.GetSchemeAuthority()+url, bodyReader)
 	if err != nil {
 		return Wrap(ErrFailedToCreateRequest, err)
 	}
@@ -114,7 +125,7 @@ func req(g GNS3Client, method, url string, expectedStatus int, body, result inte
 	defer req.Body.Close()
 
 	// Send request
-	resp, err := g.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return Wrap(ErrRequestFailed, err)
 	}

@@ -6,7 +6,7 @@ import (
 )
 
 func TestUpdateProjectA(t *testing.T) {
-	c := gons3.ProjectCreate{}
+	c := gons3.ProjectBuilder{}
 	c.SetName("TestUpdateA")
 	ci, err := gons3.CreateProject(client, c)
 	if err != nil {
@@ -14,7 +14,7 @@ func TestUpdateProjectA(t *testing.T) {
 	}
 	defer gons3.DeleteProject(client, ci.ProjectID)
 
-	u := gons3.ProjectUpdate{}
+	u := gons3.ProjectUpdater{}
 	u.SetName("TestUpdateAA")
 	u.SetAutoClose(true)
 	u.SetAutoOpen(true)
@@ -90,7 +90,7 @@ func TestUpdateProjectA(t *testing.T) {
 }
 
 func TestUpdateProjectB(t *testing.T) {
-	c := gons3.ProjectCreate{}
+	c := gons3.ProjectBuilder{}
 	c.SetName("TestUpdateB")
 	ci, err := gons3.CreateProject(client, c)
 	if err != nil {
@@ -98,7 +98,7 @@ func TestUpdateProjectB(t *testing.T) {
 	}
 	defer gons3.DeleteProject(client, ci.ProjectID)
 
-	u := gons3.ProjectUpdate{}
+	u := gons3.ProjectUpdater{}
 	u.SetName("TestUpdateBB")
 	u.SetAutoClose(false)
 	u.SetAutoOpen(false)

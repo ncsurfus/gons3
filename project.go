@@ -49,101 +49,101 @@ type Project struct {
 }
 
 // IsOpened returns true if the project status is set to opened.
-func (proj Project) IsOpened() bool {
-	return proj.Status == "opened"
+func (project Project) IsOpened() bool {
+	return project.Status == "opened"
 }
 
 // CreateProject creates a GNS3 project with the specified name.
-func CreateProject(g GNS3Client, p ProjectCreate) (Project, error) {
+func CreateProject(client GNS3Client, projectBuilder ProjectBuilder) (Project, error) {
 	path := "/v2/projects"
-	proj := Project{}
-	if err := post(g, path, 201, p.values, &proj); err != nil {
+	project := Project{}
+	if err := post(client, path, 201, projectBuilder.values, &project); err != nil {
 		return Project{}, err
 	}
-	return proj, nil
+	return project, nil
 }
 
 // UpdateProject creates a GNS3 project with the specified name.
-func UpdateProject(g GNS3Client, projectID string, p ProjectUpdate) (Project, error) {
+func UpdateProject(client GNS3Client, projectID string, projectUpdater ProjectUpdater) (Project, error) {
 	if projectID == "" {
 		return Project{}, ErrEmptyProjectID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID)
-	proj := Project{}
-	if err := put(g, path, 200, p.values, &proj); err != nil {
+	project := Project{}
+	if err := put(client, path, 200, projectUpdater.values, &project); err != nil {
 		return Project{}, err
 	}
-	return proj, nil
+	return project, nil
 }
 
 // DeleteProject deletes a GNS3 project instance with the specified id.
-func DeleteProject(g GNS3Client, projectID string) error {
+func DeleteProject(client GNS3Client, projectID string) error {
 	if projectID == "" {
 		return ErrEmptyProjectID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID)
-	if err := delete(g, path, 204, nil); err != nil {
+	if err := delete(client, path, 204, nil); err != nil {
 		return err
 	}
 	return nil
 }
 
 // GetProject gets a GNS3 project instance with the specified id.
-func GetProject(g GNS3Client, projectID string) (Project, error) {
+func GetProject(client GNS3Client, projectID string) (Project, error) {
 	if projectID == "" {
 		return Project{}, ErrEmptyProjectID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID)
-	proj := Project{}
-	if err := get(g, path, 200, &proj); err != nil {
+	project := Project{}
+	if err := get(client, path, 200, &project); err != nil {
 		return Project{}, err
 	}
-	return proj, nil
+	return project, nil
 }
 
 // GetProjects gets all the GNS3 projects.
-func GetProjects(g GNS3Client) ([]Project, error) {
+func GetProjects(client GNS3Client) ([]Project, error) {
 	path := "/v2/projects"
-	proj := []Project{}
-	if err := get(g, path, 200, &proj); err != nil {
+	project := []Project{}
+	if err := get(client, path, 200, &project); err != nil {
 		return []Project{}, err
 	}
-	return proj, nil
+	return project, nil
 }
 
 // OpenProject opens the GNS3 project.
-func OpenProject(g GNS3Client, projectID string) (Project, error) {
+func OpenProject(client GNS3Client, projectID string) (Project, error) {
 	if projectID == "" {
 		return Project{}, ErrEmptyProjectID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/open"
-	proj := Project{}
-	if err := post(g, path, 201, nil, &proj); err != nil {
+	project := Project{}
+	if err := post(client, path, 201, nil, &project); err != nil {
 		return Project{}, err
 	}
-	return proj, nil
+	return project, nil
 }
 
 // CloseProject opens the GNS3 project.
-func CloseProject(g GNS3Client, projectID string) (Project, error) {
+func CloseProject(client GNS3Client, projectID string) (Project, error) {
 	if projectID == "" {
 		return Project{}, ErrEmptyProjectID
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/close"
-	proj := Project{}
-	if err := post(g, path, 201, nil, &proj); err != nil {
+	PROJECT := Project{}
+	if err := post(client, path, 201, nil, &PROJECT); err != nil {
 		return Project{}, err
 	}
-	return proj, nil
+	return PROJECT, nil
 }
 
 // ReadProjectFile reads a GNS3 project's file.
-func ReadProjectFile(g GNS3Client, projectID, filepath string) ([]byte, error) {
+func ReadProjectFile(client GNS3Client, projectID, filepath string) ([]byte, error) {
 	if projectID == "" {
 		return []byte{}, ErrEmptyProjectID
 	}
@@ -153,14 +153,14 @@ func ReadProjectFile(g GNS3Client, projectID, filepath string) ([]byte, error) {
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/files/" + filepath
 	data := []byte{}
-	if err := get(g, path, 200, &data); err != nil {
+	if err := get(client, path, 200, &data); err != nil {
 		return []byte{}, err
 	}
 	return data, nil
 }
 
 // WriteProjectFile writes a GNS3 project's file.
-func WriteProjectFile(g GNS3Client, projectID, filepath string, data []byte) error {
+func WriteProjectFile(client GNS3Client, projectID, filepath string, data []byte) error {
 	if projectID == "" {
 		return ErrEmptyProjectID
 	}
@@ -169,7 +169,7 @@ func WriteProjectFile(g GNS3Client, projectID, filepath string, data []byte) err
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/files/" + filepath
-	if err := post(g, path, 200, &data, nil); err != nil {
+	if err := post(client, path, 200, &data, nil); err != nil {
 		return err
 	}
 	return nil
