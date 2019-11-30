@@ -30,6 +30,9 @@ func (n *LinkNodeUpdater) SetLabelProperty(name string, value interface{}) {
 
 // SetNodeID sets the NodeID for the node to be updated.
 func (n *LinkNodeUpdater) SetNodeID(nodeID string) {
+	// adapter_number and port_number must exist, but aren't actually checked
+	// I guess the assumption is you can't connect a node to itself.
+	// https://github.com/GNS3/gns3-server/blob/2.2/gns3server/controller/link.py#L274-L283
 	n.SetProperty("adapter_number", 0)
 	n.SetProperty("port_number", 0)
 	n.SetProperty("node_id", nodeID)
