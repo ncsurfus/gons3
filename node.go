@@ -76,27 +76,6 @@ func (node Node) attachNodeID() {
 	}
 }
 
-// GetLinkNodeBuilder gets a LinkNode from a port index.
-func (port NodePort) GetLinkNodeBuilder() LinkNodeBuilder {
-	linkNodeBuilder := LinkNodeBuilder{}
-	linkNodeBuilder.SetNodeID(port.NodeID)
-	linkNodeBuilder.SetAdapterNumber(port.AdapterNumber)
-	linkNodeBuilder.SetPortNumber(port.PortNumber)
-
-	return linkNodeBuilder
-}
-
-// LinkPorts links two ports into a LinkBuilder.
-func LinkPorts(portA, portB NodePort) LinkBuilder {
-	linkNodeBuilderA := portA.GetLinkNodeBuilder()
-	linkNodeBuilderB := portB.GetLinkNodeBuilder()
-
-	linkBuilder := LinkBuilder{}
-	linkBuilder.SetNodes(linkNodeBuilderA, linkNodeBuilderB)
-
-	return linkBuilder
-}
-
 // CreateNode creates a GNS3 node.
 func CreateNode(client GNS3Client, projectID string, nodeBuilder NodeBuilder) (Node, error) {
 	if projectID == "" {
@@ -106,6 +85,30 @@ func CreateNode(client GNS3Client, projectID string, nodeBuilder NodeBuilder) (N
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes"
 	node := Node{}
 	if err := post(client, path, 201, nodeBuilder.values, &node); err != nil {
+		return Node{}, err
+	}
+	node.attachNodeID()
+
+	return node, nil
+}
+
+// DuplicateNode duplicates a GNS3 node.
+func DuplicateNode(client GNS3Client, projectID, nodeID string, x, y, z int) (Node, error) {
+	if projectID == "" {
+		return Node{}, ErrEmptyProjectID
+	}
+	if nodeID == "" {
+		return Node{}, ErrEmptyNodeID
+	}
+
+	data := map[string]interface{}{
+		"x": x,
+		"y": y,
+		"z": z,
+	}
+	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes/" + url.PathEscape(nodeID) + "/duplicate"
+	node := Node{}
+	if err := post(client, path, 201, data, &node); err != nil {
 		return Node{}, err
 	}
 	node.attachNodeID()

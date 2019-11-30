@@ -5,6 +5,15 @@ type LinkNodeBuilder struct {
 	values map[string]interface{}
 }
 
+// NewLinkNodeBuilder initializes a new LinkNodeBuilder from a set of port.
+func NewLinkNodeBuilder(nodePort NodePort) LinkNodeBuilder {
+	linkNodeBuilder := LinkNodeBuilder{}
+	linkNodeBuilder.SetNodeID(nodePort.NodeID)
+	linkNodeBuilder.SetAdapterNumber(nodePort.AdapterNumber)
+	linkNodeBuilder.SetPortNumber(nodePort.PortNumber)
+	return linkNodeBuilder
+}
+
 // SetProperty sets a custom property and value for the node.
 func (n *LinkNodeBuilder) SetProperty(name string, value interface{}) {
 	if n.values == nil {
@@ -66,6 +75,23 @@ func (n *LinkNodeBuilder) SetLabelY(y int) {
 // SetLabelRotation sets the rotation for the new node's label.
 func (n *LinkNodeBuilder) SetLabelRotation(rotation int) {
 	n.SetLabelProperty("rotation", rotation)
+}
+
+// NewLinkBuilder initializes a new LinkBuilder from a set of ports.
+func NewLinkBuilder(nodePorts ...NodePort) LinkBuilder {
+	linkNodeBuilders := make([]LinkNodeBuilder, len(nodePorts))
+	for i, port := range nodePorts {
+		linkNodeBuilder := LinkNodeBuilder{}
+		linkNodeBuilder.SetNodeID(port.NodeID)
+		linkNodeBuilder.SetAdapterNumber(port.AdapterNumber)
+		linkNodeBuilder.SetPortNumber(port.PortNumber)
+		linkNodeBuilders[i] = linkNodeBuilder
+	}
+
+	linkBuilder := LinkBuilder{}
+	linkBuilder.SetNodes(linkNodeBuilders...)
+
+	return linkBuilder
 }
 
 // LinkBuilder models a new GNS3 link between two or more nodes.

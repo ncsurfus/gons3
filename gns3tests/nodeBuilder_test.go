@@ -6,37 +6,36 @@ import (
 )
 
 func TestCreateNode_A(t *testing.T) {
-	pc := gons3.ProjectBuilder{}
-	pc.SetName("TestCreateNode_A")
-	proj, err := gons3.CreateProject(client, pc)
+	projectBuilder := gons3.NewProjectBuilder("TestCreateNodeA")
+	project, err := gons3.CreateProject(client, projectBuilder)
 	if err != nil {
 		t.Fatalf("Error creating project: %v", err)
 	}
-	defer gons3.DeleteProject(client, proj.ProjectID)
+	defer gons3.DeleteProject(client, project.ProjectID)
 
-	nc := gons3.NodeBuilder{}
-	nc.SetName("TheNode_A")
-	nc.SetNodeType("vpcs")
-	nc.SetLocalComputeID()
-	nc.SetConsoleType("telnet")
-	nc.SetConsoleAutoStart(true)
-	nc.SetX(5)
-	nc.SetY(6)
-	nc.SetZ(7)
-	nc.SetLocked(true)
-	nc.SetPortNameFormat("port-{0}")
-	nc.SetPortSegmentSize(1)
-	nc.SetFirstPortName("Mgmt0")
-	nc.SetLabelX(10)
-	nc.SetLabelY(15)
-	nc.SetLabelRotation(90)
-	nc.SetLabelStyle("font-family: TypeWriter;")
+	nodeBuilder := gons3.NodeBuilder{}
+	nodeBuilder.SetName("TheNode_A")
+	nodeBuilder.SetNodeType("vpcs")
+	nodeBuilder.SetLocalComputeID()
+	nodeBuilder.SetConsoleType("telnet")
+	nodeBuilder.SetConsoleAutoStart(true)
+	nodeBuilder.SetX(5)
+	nodeBuilder.SetY(6)
+	nodeBuilder.SetZ(7)
+	nodeBuilder.SetLocked(true)
+	nodeBuilder.SetPortNameFormat("port-{0}")
+	nodeBuilder.SetPortSegmentSize(1)
+	nodeBuilder.SetFirstPortName("Mgmt0")
+	nodeBuilder.SetLabelX(10)
+	nodeBuilder.SetLabelY(15)
+	nodeBuilder.SetLabelRotation(90)
+	nodeBuilder.SetLabelStyle("font-family: TypeWriter;")
 
-	node, err := gons3.CreateNode(client, proj.ProjectID, nc)
+	node, err := gons3.CreateNode(client, project.ProjectID, nodeBuilder)
 	if err != nil {
 		t.Fatalf("Error creating node: %v", err)
 	}
-	defer gons3.DeleteNode(client, proj.ProjectID, node.ProjectID)
+	defer gons3.DeleteNode(client, project.ProjectID, node.ProjectID)
 
 	if node.Name != "TheNode_A" {
 		t.Errorf("Expected name: %v, got %v", "TheNode_A", node.Name)
@@ -86,37 +85,36 @@ func TestCreateNode_A(t *testing.T) {
 }
 
 func TestCreateNode_B(t *testing.T) {
-	pc := gons3.ProjectBuilder{}
-	pc.SetName("TestCreateNode_B")
-	proj, err := gons3.CreateProject(client, pc)
+	projectBuilder := gons3.NewProjectBuilder("TestCreateNodeB")
+	project, err := gons3.CreateProject(client, projectBuilder)
 	if err != nil {
 		t.Fatalf("Error creating project: %v", err)
 	}
-	defer gons3.DeleteProject(client, proj.ProjectID)
+	defer gons3.DeleteProject(client, project.ProjectID)
 
-	nc := gons3.NodeBuilder{}
-	nc.SetName("TheNode_B")
-	nc.SetNodeType("ethernet_hub")
-	nc.SetLocalComputeID()
-	nc.SetConsoleType("none")
-	nc.SetConsoleAutoStart(false)
-	nc.SetX(8)
-	nc.SetY(9)
-	nc.SetZ(10)
-	nc.SetLocked(false)
-	nc.SetPortNameFormat("ports-{0}")
-	nc.SetPortSegmentSize(2)
-	nc.SetFirstPortName("Mgmt1")
-	nc.SetLabelX(20)
-	nc.SetLabelY(30)
-	nc.SetLabelRotation(180)
-	nc.SetLabelStyle("font-family: Verdana;")
+	nodeBuilder := gons3.NodeBuilder{}
+	nodeBuilder.SetName("TheNode_B")
+	nodeBuilder.SetNodeType("ethernet_hub")
+	nodeBuilder.SetLocalComputeID()
+	nodeBuilder.SetConsoleType("none")
+	nodeBuilder.SetConsoleAutoStart(false)
+	nodeBuilder.SetX(8)
+	nodeBuilder.SetY(9)
+	nodeBuilder.SetZ(10)
+	nodeBuilder.SetLocked(false)
+	nodeBuilder.SetPortNameFormat("ports-{0}")
+	nodeBuilder.SetPortSegmentSize(2)
+	nodeBuilder.SetFirstPortName("Mgmt1")
+	nodeBuilder.SetLabelX(20)
+	nodeBuilder.SetLabelY(30)
+	nodeBuilder.SetLabelRotation(180)
+	nodeBuilder.SetLabelStyle("font-family: Verdana;")
 
-	node, err := gons3.CreateNode(client, proj.ProjectID, nc)
+	node, err := gons3.CreateNode(client, project.ProjectID, nodeBuilder)
 	if err != nil {
 		t.Fatalf("Error creating node: %v", err)
 	}
-	defer gons3.DeleteNode(client, proj.ProjectID, node.ProjectID)
+	defer gons3.DeleteNode(client, project.ProjectID, node.ProjectID)
 
 	if node.Name != "TheNode_B" {
 		t.Errorf("Expected name: %v, got %v", "TheNode_B", node.Name)

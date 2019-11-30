@@ -6,41 +6,36 @@ import (
 )
 
 func TestUpdateNode_A(t *testing.T) {
-	pc := gons3.ProjectBuilder{}
-	pc.SetName("TestUpdateNode_A")
-	proj, err := gons3.CreateProject(client, pc)
+	projectBuilder := gons3.NewProjectBuilder("TestUpdateNodeA")
+	proj, err := gons3.CreateProject(client, projectBuilder)
 	if err != nil {
 		t.Fatalf("Error creating project: %v", err)
 	}
 	defer gons3.DeleteProject(client, proj.ProjectID)
 
-	nc := gons3.NodeBuilder{}
-	nc.SetName("TheNode_A")
-	nc.SetNodeType("vpcs")
-	nc.SetLocalComputeID()
-	node, err := gons3.CreateNode(client, proj.ProjectID, nc)
+	nodeBuilder := gons3.NewNodeBuilder("TheNode_A", "vpcs")
+	newNode, err := gons3.CreateNode(client, proj.ProjectID, nodeBuilder)
 	if err != nil {
 		t.Fatalf("Error creating node: %v", err)
 	}
-	defer gons3.DeleteNode(client, proj.ProjectID, node.ProjectID)
+	defer gons3.DeleteNode(client, proj.ProjectID, newNode.ProjectID)
 
-	nu := gons3.NodeUpdater{}
-	nu.SetName("TheNode")
-	nu.SetConsoleType("none")
-	nu.SetConsoleAutoStart(true)
-	nu.SetX(5)
-	nu.SetY(6)
-	nu.SetZ(7)
-	nu.SetLocked(true)
-	nu.SetPortNameFormat("port-{0}")
-	nu.SetPortSegmentSize(1)
-	nu.SetFirstPortName("Mgmt0")
-
+	nodeUpdater := gons3.NodeUpdater{}
+	nodeUpdater.SetName("TheNode")
+	nodeUpdater.SetConsoleType("none")
+	nodeUpdater.SetConsoleAutoStart(true)
+	nodeUpdater.SetX(5)
+	nodeUpdater.SetY(6)
+	nodeUpdater.SetZ(7)
+	nodeUpdater.SetLocked(true)
+	nodeUpdater.SetPortNameFormat("port-{0}")
+	nodeUpdater.SetPortSegmentSize(1)
+	nodeUpdater.SetFirstPortName("Mgmt0")
 	// If the node name is changed, label.x gets centered, so no use in setting it.
-	nu.SetLabelY(15)
-	nu.SetLabelRotation(90)
-	nu.SetLabelStyle("font-family: TypeWriter;")
-	node, err = gons3.UpdateNode(client, proj.ProjectID, node.NodeID, nu)
+	nodeUpdater.SetLabelY(15)
+	nodeUpdater.SetLabelRotation(90)
+	nodeUpdater.SetLabelStyle("font-family: TypeWriter;")
+	node, err := gons3.UpdateNode(client, proj.ProjectID, newNode.NodeID, nodeUpdater)
 	if err != nil {
 		t.Fatalf("Error updating node: %v", err)
 	}
@@ -87,40 +82,36 @@ func TestUpdateNode_A(t *testing.T) {
 }
 
 func TestUpdateNode_B(t *testing.T) {
-	pc := gons3.ProjectBuilder{}
-	pc.SetName("TestUpdateNode_B")
-	proj, err := gons3.CreateProject(client, pc)
+	projectBuilder := gons3.NewProjectBuilder("TestUpdateNode_B")
+	project, err := gons3.CreateProject(client, projectBuilder)
 	if err != nil {
 		t.Fatalf("Error creating project: %v", err)
 	}
-	defer gons3.DeleteProject(client, proj.ProjectID)
+	defer gons3.DeleteProject(client, project.ProjectID)
 
-	nc := gons3.NodeBuilder{}
-	nc.SetName("TheNode_B")
-	nc.SetNodeType("ethernet_hub")
-	nc.SetLocalComputeID()
-	node, err := gons3.CreateNode(client, proj.ProjectID, nc)
+	nodeBuilder := gons3.NewNodeBuilder("TheNode_B", "ethernet_hub")
+	newNode, err := gons3.CreateNode(client, project.ProjectID, nodeBuilder)
 	if err != nil {
 		t.Fatalf("Error creating node: %v", err)
 	}
-	defer gons3.DeleteNode(client, proj.ProjectID, node.ProjectID)
+	defer gons3.DeleteNode(client, project.ProjectID, newNode.ProjectID)
 
-	nu := gons3.NodeUpdater{}
-	nu.SetConsoleType("none")
-	nu.SetConsoleAutoStart(false)
-	nu.SetX(8)
-	nu.SetY(9)
-	nu.SetZ(10)
-	nu.SetLocked(false)
-	nu.SetPortNameFormat("ports-{0}")
-	nu.SetPortSegmentSize(2)
-	nu.SetFirstPortName("Mgmt1")
-	nu.SetLabelX(20)
-	nu.SetLabelY(30)
-	nu.SetLabelRotation(180)
-	nu.SetLabelStyle("font-family: Verdana;")
+	nodeUpdater := gons3.NodeUpdater{}
+	nodeUpdater.SetConsoleType("none")
+	nodeUpdater.SetConsoleAutoStart(false)
+	nodeUpdater.SetX(8)
+	nodeUpdater.SetY(9)
+	nodeUpdater.SetZ(10)
+	nodeUpdater.SetLocked(false)
+	nodeUpdater.SetPortNameFormat("ports-{0}")
+	nodeUpdater.SetPortSegmentSize(2)
+	nodeUpdater.SetFirstPortName("Mgmt1")
+	nodeUpdater.SetLabelX(20)
+	nodeUpdater.SetLabelY(30)
+	nodeUpdater.SetLabelRotation(180)
+	nodeUpdater.SetLabelStyle("font-family: Verdana;")
 
-	node, err = gons3.UpdateNode(client, proj.ProjectID, node.NodeID, nu)
+	node, err := gons3.UpdateNode(client, project.ProjectID, newNode.NodeID, nodeUpdater)
 	if err != nil {
 		t.Fatalf("Error updating node: %v", err)
 	}

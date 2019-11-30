@@ -6,8 +6,7 @@ import (
 )
 
 func TestGetProject(t *testing.T) {
-	projectBuilder := gons3.ProjectBuilder{}
-	projectBuilder.SetName("TestGetProject")
+	projectBuilder := gons3.NewProjectBuilder("TestGetProject")
 	createdProject, err := gons3.CreateProject(client, projectBuilder)
 	if err != nil {
 		t.Fatalf("Error creating project: %v", err)
@@ -24,16 +23,14 @@ func TestGetProject(t *testing.T) {
 }
 
 func TestGetProjects(t *testing.T) {
-	projectBuilderA := gons3.ProjectBuilder{}
-	projectBuilderA.SetName("TestGetProjectsA")
+	projectBuilderA := gons3.NewProjectBuilder("TestGetProjectsA")
 	createdProjectA, err := gons3.CreateProject(client, projectBuilderA)
 	if err != nil {
 		t.Fatalf("Error creating project A: %v", err)
 	}
 	defer gons3.DeleteProject(client, createdProjectA.ProjectID)
 
-	projectBuilderB := gons3.ProjectBuilder{}
-	projectBuilderB.SetName("TestGetProjectsB")
+	projectBuilderB := gons3.NewProjectBuilder("TestGetProjectsB")
 	createdProjectB, err := gons3.CreateProject(client, projectBuilderB)
 	if err != nil {
 		t.Fatalf("Error creating project B: %v", err)
@@ -63,60 +60,57 @@ func TestGetProjects(t *testing.T) {
 }
 
 func TestDeleteProject(t *testing.T) {
-	c := gons3.ProjectBuilder{}
-	c.SetName("TestDeleteProject")
-	ci, err := gons3.CreateProject(client, c)
+	projectBuilder := gons3.NewProjectBuilder("TestDeleteProject")
+	project, err := gons3.CreateProject(client, projectBuilder)
 	if err != nil {
 		t.Fatalf("Error creating project: %v", err)
 	}
 
-	err = gons3.DeleteProject(client, ci.ProjectID)
+	err = gons3.DeleteProject(client, project.ProjectID)
 	if err != nil {
 		t.Fatalf("Error deleting project: %v", err)
 	}
 }
 
 func TestOpenCloseProject(t *testing.T) {
-	c := gons3.ProjectBuilder{}
-	c.SetName("TestOpenCloseProject")
-	ci, err := gons3.CreateProject(client, c)
+	projectBuilder := gons3.NewProjectBuilder("TestOpenCloseProject")
+	createdProject, err := gons3.CreateProject(client, projectBuilder)
 	if err != nil {
 		t.Fatalf("Error creating project: %v", err)
 	}
-	defer gons3.DeleteProject(client, ci.ProjectID)
+	defer gons3.DeleteProject(client, createdProject.ProjectID)
 
-	ci, err = gons3.OpenProject(client, ci.ProjectID)
+	openedProject, err := gons3.OpenProject(client, createdProject.ProjectID)
 	if err != nil {
 		t.Fatalf("Error opening project: %v", err)
 	}
-	if !ci.IsOpened() {
-		t.Errorf("Expected IsOpened(): %v, got %v", true, ci.IsOpened())
+	if !openedProject.IsOpened() {
+		t.Errorf("Expected IsOpened(): %v, got %v", true, openedProject.IsOpened())
 	}
 
-	ci, err = gons3.CloseProject(client, ci.ProjectID)
+	closedProject, err := gons3.CloseProject(client, createdProject.ProjectID)
 	if err != nil {
 		t.Fatalf("Error closing project: %v", err)
 	}
-	if ci.IsOpened() {
-		t.Errorf("Expected IsOpened(): %v, got %v", false, ci.IsOpened())
+	if closedProject.IsOpened() {
+		t.Errorf("Expected IsOpened(): %v, got %v", false, closedProject.IsOpened())
 	}
 }
 
 func TestReadWriteProjectFile(t *testing.T) {
-	c := gons3.ProjectBuilder{}
-	c.SetName("TestReadWriteProjectFile")
-	ci, err := gons3.CreateProject(client, c)
+	projectBuilder := gons3.NewProjectBuilder("TestReadWriteProjectFile")
+	project, err := gons3.CreateProject(client, projectBuilder)
 	if err != nil {
 		t.Fatalf("Error creating project: %v", err)
 	}
-	defer gons3.DeleteProject(client, ci.ProjectID)
+	defer gons3.DeleteProject(client, project.ProjectID)
 
-	err = gons3.WriteProjectFile(client, ci.ProjectID, "testing", []byte("the test"))
+	err = gons3.WriteProjectFile(client, project.ProjectID, "testing", []byte("the test"))
 	if err != nil {
 		t.Fatalf("Error writing project file: %v", err)
 	}
 
-	data, err := gons3.ReadProjectFile(client, ci.ProjectID, "testing")
+	data, err := gons3.ReadProjectFile(client, project.ProjectID, "testing")
 	sdata := string(data)
 	if err != nil {
 		t.Fatalf("Error reading project file: %v", err)

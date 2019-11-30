@@ -6,33 +6,26 @@ import (
 )
 
 func TestUpdateLinkA(t *testing.T) {
-	projectBuilder := gons3.ProjectBuilder{}
-	projectBuilder.SetName("TestCreateLinkA")
+	projectBuilder := gons3.NewProjectBuilder("TestCreateLinkA")
 	project, err := gons3.CreateProject(client, projectBuilder)
 	if err != nil {
 		t.Fatalf("Error creating project: %v", err)
 	}
 	defer gons3.DeleteProject(client, project.ProjectID)
 
-	nodeBuilderA := gons3.NodeBuilder{}
-	nodeBuilderA.SetName("TheNodeA")
-	nodeBuilderA.SetNodeType("ethernet_hub")
-	nodeBuilderA.SetLocalComputeID()
+	nodeBuilderA := gons3.NewNodeBuilder("TheNodeA", "ethernet_hub")
 	nodeA, err := gons3.CreateNode(client, project.ProjectID, nodeBuilderA)
 	if err != nil {
 		t.Fatalf("Error creating nodeA: %v", err)
 	}
 
-	nodeBuilderB := gons3.NodeBuilder{}
-	nodeBuilderB.SetName("TheNodeB")
-	nodeBuilderB.SetNodeType("ethernet_hub")
-	nodeBuilderB.SetLocalComputeID()
+	nodeBuilderB := gons3.NewNodeBuilder("TheNodeB", "ethernet_hub")
 	nodeB, err := gons3.CreateNode(client, project.ProjectID, nodeBuilderB)
 	if err != nil {
 		t.Fatalf("Error creating nodeB: %v", err)
 	}
 
-	linkBuilder := gons3.LinkPorts(nodeA.Ports[1], nodeB.Ports[1])
+	linkBuilder := gons3.NewLinkBuilder(nodeA.Ports[1], nodeB.Ports[1])
 	newLink, err := gons3.CreateLink(client, project.ProjectID, linkBuilder)
 	if err != nil {
 		t.Fatalf("Error creating link: %v", err)

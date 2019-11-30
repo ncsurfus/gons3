@@ -5,6 +5,13 @@ type ProjectBuilder struct {
 	values map[string]interface{}
 }
 
+// NewProjectBuilder initializes a new project with the specified name.
+func NewProjectBuilder(name string) ProjectBuilder {
+	projectBuilder := ProjectBuilder{}
+	projectBuilder.SetName(name)
+	return projectBuilder
+}
+
 // SetProperty sets a custom property and value for the project.
 func (n *ProjectBuilder) SetProperty(name string, value interface{}) {
 	if n.values == nil {

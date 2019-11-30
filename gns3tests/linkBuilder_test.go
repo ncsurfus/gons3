@@ -6,40 +6,32 @@ import (
 )
 
 func TestCreateLinkA(t *testing.T) {
-	projectBuilder := gons3.ProjectBuilder{}
-	projectBuilder.SetName("TestCreateLinkA")
+	projectBuilder := gons3.NewProjectBuilder("TestCreateLinkA")
 	project, err := gons3.CreateProject(client, projectBuilder)
 	if err != nil {
 		t.Fatalf("Error creating project: %v", err)
 	}
 	defer gons3.DeleteProject(client, project.ProjectID)
 
-	nodeBuilderA := gons3.NodeBuilder{}
-	nodeBuilderA.SetName("TheNodeA")
-	nodeBuilderA.SetNodeType("vpcs")
-	nodeBuilderA.SetLocalComputeID()
+	nodeBuilderA := gons3.NewNodeBuilder("TheNodeA", "vpcs")
 	nodeA, err := gons3.CreateNode(client, project.ProjectID, nodeBuilderA)
 	if err != nil {
 		t.Fatalf("Error creating nodeA: %v", err)
 	}
 
-	nodeBuilderB := gons3.NodeBuilder{}
-	nodeBuilderB.SetName("TheNodeB")
-	nodeBuilderB.SetNodeType("vpcs")
-	nodeBuilderB.SetLocalComputeID()
-	nodeB, err := gons3.CreateNode(client, project.ProjectID, nodeBuilderB)
+	nodeB, err := gons3.DuplicateNode(client, project.ProjectID, nodeA.NodeID, 0, 0, 0)
 	if err != nil {
 		t.Fatalf("Error creating nodeB: %v", err)
 	}
 
-	LinkNodeBuilderA := nodeA.Ports[0].GetLinkNodeBuilder()
+	LinkNodeBuilderA := gons3.NewLinkNodeBuilder(nodeA.Ports[0])
 	LinkNodeBuilderA.SetLabelX(5)
 	LinkNodeBuilderA.SetLabelY(6)
 	LinkNodeBuilderA.SetLabelRotation(90)
 	LinkNodeBuilderA.SetLabelStyle("font-family: Verdana;")
 	LinkNodeBuilderA.SetLabelText("PortA")
 
-	LinkNodeBuilderB := nodeB.Ports[0].GetLinkNodeBuilder()
+	LinkNodeBuilderB := gons3.NewLinkNodeBuilder(nodeB.Ports[0])
 	LinkNodeBuilderB.SetLabelX(7)
 	LinkNodeBuilderB.SetLabelY(8)
 	LinkNodeBuilderB.SetLabelRotation(180)

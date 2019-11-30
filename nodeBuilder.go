@@ -1,9 +1,32 @@
 package gons3
 
+// IsConsoleSupport checks if the type of node supports console.
+func IsConsoleSupport(nodeType string) bool {
+	switch nodeType {
+	case "cloud", "nat", "ethernet_switch", "ethernet_hub", "frame_relay_switch", "atm_switch":
+		return false
+	default:
+		return true
+	}
+}
+
 // NodeBuilder models a new GNS3 node.
 // GNS3 schema requires values: Name, NodeType, and ComputeID
 type NodeBuilder struct {
 	values map[string]interface{}
+}
+
+// NewNodeBuilder initializes a new NodeBuilder with the required values and local compute.
+func NewNodeBuilder(name, nodeType string) NodeBuilder {
+	nodeBuilder := NodeBuilder{}
+	nodeBuilder.SetLocalComputeID()
+	nodeBuilder.SetName(name)
+	nodeBuilder.SetNodeType(nodeType)
+
+	if !IsConsoleSupport(nodeType) {
+		nodeBuilder.SetConsoleType("none")
+	}
+	return nodeBuilder
 }
 
 // SetProperty sets a custom property and value for the node.
@@ -22,8 +45,8 @@ func (n *NodeBuilder) SetName(name string) {
 // SetNodeType sets the node type for the new node.
 // GNS3 schema provides these values: cloud, nat, ethernet_hub, ethernet_switch,
 // frame_relay_switch, atm_switch, docker, dynamips, vpcs, traceng, virtualbox, vmware, iou, qemu
-func (n *NodeBuilder) SetNodeType(name string) {
-	n.SetProperty("node_type", name)
+func (n *NodeBuilder) SetNodeType(nodeType string) {
+	n.SetProperty("node_type", nodeType)
 }
 
 // SetComputeID sets the compute_id for the new node.

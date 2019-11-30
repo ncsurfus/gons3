@@ -6,126 +6,126 @@ import (
 )
 
 func TestCreateProjectA(t *testing.T) {
-	p := gons3.ProjectBuilder{}
-	p.SetName("TestCreateA")
-	p.SetAutoClose(true)
-	p.SetSceneHeight(1800)
-	p.SetSceneWidth(900)
-	p.SetZoom(50)
-	p.SetShowLayers(true)
-	p.SetSnapToGrid(true)
-	p.SetShowGrid(true)
-	p.SetGridSize(10)
-	p.SetShowInterfaceLabels(true)
-	p.SetSupplier("testLogo", "https://example")
-	p.SetVariables([]gons3.ProjectVariables{
+	projectBuilder := gons3.ProjectBuilder{}
+	projectBuilder.SetName("TestCreateA")
+	projectBuilder.SetAutoClose(true)
+	projectBuilder.SetSceneHeight(1800)
+	projectBuilder.SetSceneWidth(900)
+	projectBuilder.SetZoom(50)
+	projectBuilder.SetShowLayers(true)
+	projectBuilder.SetSnapToGrid(true)
+	projectBuilder.SetShowGrid(true)
+	projectBuilder.SetGridSize(10)
+	projectBuilder.SetShowInterfaceLabels(true)
+	projectBuilder.SetSupplier("testLogo", "https://example")
+	projectBuilder.SetVariables([]gons3.ProjectVariables{
 		gons3.ProjectVariables{
 			Name:  "Name1",
 			Value: "Value1",
 		},
 	})
-	i, err := gons3.CreateProject(client, p)
+	project, err := gons3.CreateProject(client, projectBuilder)
 	if err != nil {
 		t.Fatalf("Error creating project: %v", err)
 	}
-	defer gons3.DeleteProject(client, i.ProjectID)
+	defer gons3.DeleteProject(client, project.ProjectID)
 
-	if i.Name != "TestCreateA" {
-		t.Errorf("Expected name: %v, got %v", "TestCreateA", i.Name)
+	if project.Name != "TestCreateA" {
+		t.Errorf("Expected name: %v, got %v", "TestCreateA", project.Name)
 	}
-	if i.AutoClose != true {
-		t.Errorf("Expected autoClose: %v, got %v", true, i.AutoClose)
+	if project.AutoClose != true {
+		t.Errorf("Expected autoClose: %v, got %v", true, project.AutoClose)
 	}
-	if i.SceneHeight != 1800 {
-		t.Errorf("Expected sceneHeight: %v, got %v", 1800, i.SceneHeight)
+	if project.SceneHeight != 1800 {
+		t.Errorf("Expected sceneHeight: %v, got %v", 1800, project.SceneHeight)
 	}
-	if i.SceneWidth != 900 {
-		t.Errorf("Expected sceneWidth: %v, got %v", 900, i.SceneWidth)
+	if project.SceneWidth != 900 {
+		t.Errorf("Expected sceneWidth: %v, got %v", 900, project.SceneWidth)
 	}
-	if i.Zoom != 50 {
-		t.Errorf("Expected zoom: %v, got %v", 50, i.Zoom)
+	if project.Zoom != 50 {
+		t.Errorf("Expected zoom: %v, got %v", 50, project.Zoom)
 	}
-	if i.ShowLayers != true {
-		t.Errorf("Expected showLayers: %v, got %v", true, i.ShowLayers)
+	if project.ShowLayers != true {
+		t.Errorf("Expected showLayers: %v, got %v", true, project.ShowLayers)
 	}
-	if i.SnapToGrid != true {
-		t.Errorf("Expected snapToGrid: %v, got %v", true, i.SnapToGrid)
+	if project.SnapToGrid != true {
+		t.Errorf("Expected snapToGrid: %v, got %v", true, project.SnapToGrid)
 	}
-	if i.ShowGrid != true {
-		t.Errorf("Expected showGrid: %v, got %v", true, i.ShowGrid)
+	if project.ShowGrid != true {
+		t.Errorf("Expected showGrid: %v, got %v", true, project.ShowGrid)
 	}
-	if i.GridSize != 10 {
-		t.Errorf("Expected gridSize: %v, got %v", 10, i.GridSize)
+	if project.GridSize != 10 {
+		t.Errorf("Expected gridSize: %v, got %v", 10, project.GridSize)
 	}
-	if i.ShowInterfaceLabels != true {
-		t.Errorf("Expected showInterfaceLabels: %v, got %v", true, i.ShowInterfaceLabels)
+	if project.ShowInterfaceLabels != true {
+		t.Errorf("Expected showInterfaceLabels: %v, got %v", true, project.ShowInterfaceLabels)
 	}
-	if i.Supplier.Logo != "testLogo" {
-		t.Errorf("Expected supplier logo: %v, got %v", "testLogo", i.Supplier.Logo)
+	if project.Supplier.Logo != "testLogo" {
+		t.Errorf("Expected supplier logo: %v, got %v", "testLogo", project.Supplier.Logo)
 	}
-	if i.Supplier.URL != "https://example" {
-		t.Errorf("Expected supplier URL: %v, got %v", "https://example", i.Supplier.URL)
+	if project.Supplier.URL != "https://example" {
+		t.Errorf("Expected supplier URL: %v, got %v", "https://example", project.Supplier.URL)
 	}
-	if variables := *i.Variables; variables[0].Name != "Name1" {
+	if variables := *project.Variables; variables[0].Name != "Name1" {
 		t.Errorf("Expected variables: %v, got %v", "Name1", variables[0].Name)
 	}
-	if variables := *i.Variables; variables[0].Value != "Value1" {
+	if variables := *project.Variables; variables[0].Value != "Value1" {
 		t.Errorf("Expected variables: %v, got %v", "Value1", variables[0].Value)
 	}
 }
 
 func TestCreateProjectB(t *testing.T) {
-	p := gons3.ProjectBuilder{}
-	p.SetName("TestCreateB")
-	p.SetAutoClose(false)
-	p.SetSceneHeight(1900)
-	p.SetSceneWidth(950)
-	p.SetZoom(100)
-	p.SetShowLayers(false)
-	p.SetSnapToGrid(false)
-	p.SetShowGrid(false)
-	p.SetGridSize(20)
-	p.SetShowInterfaceLabels(false)
-	i, err := gons3.CreateProject(client, p)
+	projectBuilder := gons3.ProjectBuilder{}
+	projectBuilder.SetName("TestCreateB")
+	projectBuilder.SetAutoClose(false)
+	projectBuilder.SetSceneHeight(1900)
+	projectBuilder.SetSceneWidth(950)
+	projectBuilder.SetZoom(100)
+	projectBuilder.SetShowLayers(false)
+	projectBuilder.SetSnapToGrid(false)
+	projectBuilder.SetShowGrid(false)
+	projectBuilder.SetGridSize(20)
+	projectBuilder.SetShowInterfaceLabels(false)
+	project, err := gons3.CreateProject(client, projectBuilder)
 	if err != nil {
 		t.Fatalf("Error creating project: %v", err)
 	}
-	defer gons3.DeleteProject(client, i.ProjectID)
+	defer gons3.DeleteProject(client, project.ProjectID)
 
-	if i.Name != "TestCreateB" {
-		t.Errorf("Expected name: %v, got %v", "TestCreateB", i.Name)
+	if project.Name != "TestCreateB" {
+		t.Errorf("Expected name: %v, got %v", "TestCreateB", project.Name)
 	}
-	if i.AutoClose != false {
-		t.Errorf("Expected autoClose: %v, got %v", false, i.AutoClose)
+	if project.AutoClose != false {
+		t.Errorf("Expected autoClose: %v, got %v", false, project.AutoClose)
 	}
-	if i.SceneHeight != 1900 {
-		t.Errorf("Expected sceneHeight: %v, got %v", 1900, i.SceneHeight)
+	if project.SceneHeight != 1900 {
+		t.Errorf("Expected sceneHeight: %v, got %v", 1900, project.SceneHeight)
 	}
-	if i.SceneWidth != 950 {
-		t.Errorf("Expected sceneWidth: %v, got %v", 950, i.SceneWidth)
+	if project.SceneWidth != 950 {
+		t.Errorf("Expected sceneWidth: %v, got %v", 950, project.SceneWidth)
 	}
-	if i.Zoom != 100 {
-		t.Errorf("Expected zoom: %v, got %v", 100, i.Zoom)
+	if project.Zoom != 100 {
+		t.Errorf("Expected zoom: %v, got %v", 100, project.Zoom)
 	}
-	if i.ShowLayers != false {
-		t.Errorf("Expected showLayers: %v, got %v", false, i.ShowLayers)
+	if project.ShowLayers != false {
+		t.Errorf("Expected showLayers: %v, got %v", false, project.ShowLayers)
 	}
-	if i.SnapToGrid != false {
-		t.Errorf("Expected snapToGrid: %v, got %v", false, i.SnapToGrid)
+	if project.SnapToGrid != false {
+		t.Errorf("Expected snapToGrid: %v, got %v", false, project.SnapToGrid)
 	}
-	if i.ShowGrid != false {
-		t.Errorf("Expected showGrid: %v, got %v", false, i.ShowGrid)
+	if project.ShowGrid != false {
+		t.Errorf("Expected showGrid: %v, got %v", false, project.ShowGrid)
 	}
-	if i.GridSize != 20 {
-		t.Errorf("Expected gridSize: %v, got %v", 20, i.GridSize)
+	if project.GridSize != 20 {
+		t.Errorf("Expected gridSize: %v, got %v", 20, project.GridSize)
 	}
-	if i.ShowInterfaceLabels != false {
-		t.Errorf("Expected showInterfaceLabels: %v, got %v", false, i.ShowInterfaceLabels)
+	if project.ShowInterfaceLabels != false {
+		t.Errorf("Expected showInterfaceLabels: %v, got %v", false, project.ShowInterfaceLabels)
 	}
-	if i.Supplier != nil {
-		t.Errorf("Expected supplier: %v, got %v", nil, i.Supplier)
+	if project.Supplier != nil {
+		t.Errorf("Expected supplier: %v, got %v", nil, project.Supplier)
 	}
-	if i.Variables != nil {
-		t.Errorf("Expected variables: %v, got %v", nil, i.Variables)
+	if project.Variables != nil {
+		t.Errorf("Expected variables: %v, got %v", nil, project.Variables)
 	}
 }
