@@ -2,18 +2,45 @@ package gons3
 
 // LinkNodeBuilder creates a new LinkNode.
 type LinkNodeBuilder struct {
-	NodeID        string
-	AdapterNumber int
-	PortNumber    int
-	label         map[string]interface{}
+	values map[string]interface{}
 }
 
-// SetLabelProperty sets a custom property and value for the node.label.
-func (n *LinkNodeBuilder) SetLabelProperty(name string, value interface{}) {
-	if n.label == nil {
-		n.label = map[string]interface{}{}
+// SetProperty sets a custom property and value for the node.
+func (n *LinkNodeBuilder) SetProperty(name string, value interface{}) {
+	if n.values == nil {
+		n.values = map[string]interface{}{}
 	}
-	n.label[name] = value
+	n.values[name] = value
+}
+
+// SetLabelProperty sets a custom property and value for the node's label.
+func (n *LinkNodeBuilder) SetLabelProperty(name string, value interface{}) {
+	if n.values == nil {
+		n.values = map[string]interface{}{}
+	}
+	label, ok := n.values["label"].(map[string]interface{})
+	if !ok {
+		label = map[string]interface{}{
+			"text": "",
+		}
+		n.values["label"] = label
+	}
+	label[name] = value
+}
+
+// SetNodeID sets the NodeID for the new linkNode.
+func (n *LinkNodeBuilder) SetNodeID(nodeID string) {
+	n.SetProperty("node_id", nodeID)
+}
+
+// SetAdapterNumber sets the adapter number for the new linkNode.
+func (n *LinkNodeBuilder) SetAdapterNumber(adapterNumber int) {
+	n.SetProperty("adapter_number", adapterNumber)
+}
+
+// SetPortNumber sets the port number for the new linkNode.
+func (n *LinkNodeBuilder) SetPortNumber(portNumber int) {
+	n.SetProperty("port_number", portNumber)
 }
 
 // SetLabelText sets the text for the new linkNode's label.
@@ -73,17 +100,10 @@ func (n *LinkBuilder) SetSuspend(isSuspended bool) {
 }
 
 // SetNodes sets the nodes that are a part of the link.
-func (n *LinkBuilder) SetNodes(linkNodes []LinkNodeBuilder) {
-	nodes := make([]map[string]interface{}, len(linkNodes))
-	for i, linkNode := range linkNodes {
-		node := map[string]interface{}{}
-		node["node_id"] = linkNode.NodeID
-		node["adapter_number"] = linkNode.AdapterNumber
-		node["port_number"] = linkNode.PortNumber
-		if linkNode.label != nil {
-			node["label"] = linkNode.label
-		}
-		nodes[i] = node
+func (n *LinkBuilder) SetNodes(linkNodeBuilders []LinkNodeBuilder) {
+	linkNodes := make([]map[string]interface{}, len(linkNodeBuilders))
+	for i, linkNode := range linkNodeBuilders {
+		linkNodes[i] = linkNode.values
 	}
-	n.SetProperty("nodes", nodes)
+	n.SetProperty("nodes", linkNodes)
 }

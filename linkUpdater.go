@@ -19,17 +19,10 @@ func (n *LinkUpdater) SetSuspend(isSuspended bool) {
 }
 
 // SetNodes sets the nodes that are a part of the link.
-func (n *LinkUpdater) SetNodes(linkNodes []LinkNodeBuilder) {
-	nodes := make([]map[string]interface{}, len(linkNodes))
-	for i, linkNode := range linkNodes {
-		node := map[string]interface{}{}
-		node["node_id"] = linkNode.NodeID
-		node["adapter_number"] = linkNode.AdapterNumber
-		node["port_number"] = linkNode.PortNumber
-		if linkNode.label != nil {
-			node["label"] = linkNode.label
-		}
-		nodes[i] = node
+func (n *LinkUpdater) SetNodes(linkNodeBuilders []LinkNodeBuilder) {
+	linkNodes := make([]map[string]interface{}, len(linkNodeBuilders))
+	for i, linkNode := range linkNodeBuilders {
+		linkNodes[i] = linkNode.values
 	}
-	n.SetProperty("nodes", nodes)
+	n.SetProperty("nodes", linkNodes)
 }

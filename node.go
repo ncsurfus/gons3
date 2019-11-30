@@ -69,6 +69,16 @@ func (node Node) IsStopped() bool {
 	return node.Status == "stopped"
 }
 
+// GetLinkNodeBuilder gets a LinkNode from a port index.
+func (node Node) GetLinkNodeBuilder(nodePortIndex int) LinkNodeBuilder {
+	linkNodeBuilder := LinkNodeBuilder{}
+	linkNodeBuilder.SetNodeID(node.NodeID)
+	linkNodeBuilder.SetAdapterNumber(node.Ports[nodePortIndex].AdapterNumber)
+	linkNodeBuilder.SetPortNumber(node.Ports[nodePortIndex].PortNumber)
+
+	return linkNodeBuilder
+}
+
 // CreateNode creates a GNS3 node.
 func CreateNode(client GNS3Client, projectID string, nodeBuilder NodeBuilder) (Node, error) {
 	if projectID == "" {
