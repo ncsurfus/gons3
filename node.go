@@ -44,6 +44,7 @@ type Node struct {
 
 // NodePort models a GNS3 node's port.
 type NodePort struct {
+	NodeID        string
 	Name          string                 `json:"name"`
 	ShortName     string                 `json:"short_name"`
 	AdapterNumber int                    `json:"adapter_number"`
@@ -69,14 +70,31 @@ func (node Node) IsStopped() bool {
 	return node.Status == "stopped"
 }
 
+func (node Node) attachNodeID() {
+	for i := range node.Ports {
+		node.Ports[i].NodeID = node.NodeID
+	}
+}
+
 // GetLinkNodeBuilder gets a LinkNode from a port index.
-func (node Node) GetLinkNodeBuilder(nodePortIndex int) LinkNodeBuilder {
+func (port NodePort) GetLinkNodeBuilder() LinkNodeBuilder {
 	linkNodeBuilder := LinkNodeBuilder{}
-	linkNodeBuilder.SetNodeID(node.NodeID)
-	linkNodeBuilder.SetAdapterNumber(node.Ports[nodePortIndex].AdapterNumber)
-	linkNodeBuilder.SetPortNumber(node.Ports[nodePortIndex].PortNumber)
+	linkNodeBuilder.SetNodeID(port.NodeID)
+	linkNodeBuilder.SetAdapterNumber(port.AdapterNumber)
+	linkNodeBuilder.SetPortNumber(port.PortNumber)
 
 	return linkNodeBuilder
+}
+
+// LinkPorts links two ports into a LinkBuilder.
+func LinkPorts(portA, portB NodePort) LinkBuilder {
+	linkNodeBuilderA := portA.GetLinkNodeBuilder()
+	linkNodeBuilderB := portB.GetLinkNodeBuilder()
+
+	linkBuilder := LinkBuilder{}
+	linkBuilder.SetNodes(linkNodeBuilderA, linkNodeBuilderB)
+
+	return linkBuilder
 }
 
 // CreateNode creates a GNS3 node.
@@ -90,6 +108,8 @@ func CreateNode(client GNS3Client, projectID string, nodeBuilder NodeBuilder) (N
 	if err := post(client, path, 201, nodeBuilder.values, &node); err != nil {
 		return Node{}, err
 	}
+	node.attachNodeID()
+
 	return node, nil
 }
 
@@ -107,6 +127,7 @@ func UpdateNode(client GNS3Client, projectID, nodeID string, nodeBuilder NodeUpd
 	if err := put(client, path, 200, nodeBuilder.values, &node); err != nil {
 		return Node{}, err
 	}
+	node.attachNodeID()
 
 	return node, nil
 }
@@ -118,11 +139,15 @@ func GetNodes(client GNS3Client, projectID string) ([]Node, error) {
 	}
 
 	path := "/v2/projects/" + url.PathEscape(projectID) + "/nodes"
-	node := []Node{}
-	if err := get(client, path, 200, &node); err != nil {
+	nodes := []Node{}
+	if err := get(client, path, 200, &nodes); err != nil {
 		return []Node{}, err
 	}
-	return node, nil
+	for _, node := range nodes {
+		node.attachNodeID()
+	}
+
+	return nodes, nil
 }
 
 // GetNode gets a GNS3 node instance with the specified id.
@@ -139,6 +164,8 @@ func GetNode(client GNS3Client, projectID, nodeID string) (Node, error) {
 	if err := get(client, path, 200, &node); err != nil {
 		return Node{}, err
 	}
+	node.attachNodeID()
+
 	return node, nil
 }
 
@@ -172,6 +199,8 @@ func StartNode(client GNS3Client, projectID, nodeID string) (Node, error) {
 	if err := post(client, path, 200, nil, &node); err != nil {
 		return Node{}, err
 	}
+	node.attachNodeID()
+
 	return node, nil
 }
 
@@ -202,6 +231,8 @@ func StopNode(client GNS3Client, projectID, nodeID string) (Node, error) {
 	if err := post(client, path, 200, nil, &node); err != nil {
 		return Node{}, err
 	}
+	node.attachNodeID()
+
 	return node, nil
 }
 
@@ -232,6 +263,8 @@ func SuspendNode(client GNS3Client, projectID, nodeID string) (Node, error) {
 	if err := post(client, path, 200, nil, &node); err != nil {
 		return Node{}, err
 	}
+	node.attachNodeID()
+
 	return node, nil
 }
 
@@ -262,6 +295,8 @@ func ReloadNode(client GNS3Client, projectID, nodeID string) (Node, error) {
 	if err := post(client, path, 200, nil, &node); err != nil {
 		return Node{}, err
 	}
+	node.attachNodeID()
+
 	return node, nil
 }
 

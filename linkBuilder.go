@@ -100,7 +100,7 @@ func (n *LinkBuilder) SetSuspend(isSuspended bool) {
 }
 
 // SetNodes sets the nodes that are a part of the link.
-func (n *LinkBuilder) SetNodes(linkNodeBuilders []LinkNodeBuilder) {
+func (n *LinkBuilder) SetNodes(linkNodeBuilders ...LinkNodeBuilder) {
 	linkNodes := make([]map[string]interface{}, len(linkNodeBuilders))
 	for i, linkNode := range linkNodeBuilders {
 		linkNodes[i] = linkNode.values

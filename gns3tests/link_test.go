@@ -32,8 +32,7 @@ func TestGetLink(t *testing.T) {
 		fatalAssert(t, "CreateNode(B) error", nil, err)
 	}
 
-	linkBuilder := gons3.LinkBuilder{}
-	linkBuilder.SetNodes([]gons3.LinkNodeBuilder{nodeA.GetLinkNodeBuilder(0), nodeB.GetLinkNodeBuilder(0)})
+	linkBuilder := gons3.LinkPorts(nodeA.Ports[0], nodeB.Ports[0])
 	createdLink, err := gons3.CreateLink(client, project.ProjectID, linkBuilder)
 	if err != nil {
 		fatalAssert(t, "CreateLink error", nil, err)
@@ -81,15 +80,13 @@ func TestGetLinks(t *testing.T) {
 		t.Fatalf("Error creating nodeB: %v", err)
 	}
 
-	linkBuilderA := gons3.LinkBuilder{}
-	linkBuilderA.SetNodes([]gons3.LinkNodeBuilder{nodeA.GetLinkNodeBuilder(0), nodeB.GetLinkNodeBuilder(0)})
+	linkBuilderA := gons3.LinkPorts(nodeA.Ports[0], nodeB.Ports[0])
 	createdLinkA, err := gons3.CreateLink(client, project.ProjectID, linkBuilderA)
 	if err != nil {
 		t.Fatalf("Error creating linkA: %v", err)
 	}
 
-	linkBuilderB := gons3.LinkBuilder{}
-	linkBuilderB.SetNodes([]gons3.LinkNodeBuilder{nodeA.GetLinkNodeBuilder(1), nodeB.GetLinkNodeBuilder(1)})
+	linkBuilderB := gons3.LinkPorts(nodeA.Ports[1], nodeB.Ports[1])
 	createdLinkB, err := gons3.CreateLink(client, project.ProjectID, linkBuilderB)
 	if err != nil {
 		t.Fatalf("Error creating linkB: %v", err)
@@ -139,15 +136,13 @@ func TestGetNodeLinks(t *testing.T) {
 		t.Fatalf("Error creating nodeB: %v", err)
 	}
 
-	linkBuilderA := gons3.LinkBuilder{}
-	linkBuilderA.SetNodes([]gons3.LinkNodeBuilder{nodeA.GetLinkNodeBuilder(0), nodeB.GetLinkNodeBuilder(0)})
+	linkBuilderA := gons3.LinkPorts(nodeA.Ports[0], nodeB.Ports[0])
 	createdLinkA, err := gons3.CreateLink(client, project.ProjectID, linkBuilderA)
 	if err != nil {
 		t.Fatalf("Error creating linkA: %v", err)
 	}
 
-	linkBuilderB := gons3.LinkBuilder{}
-	linkBuilderB.SetNodes([]gons3.LinkNodeBuilder{nodeA.GetLinkNodeBuilder(1), nodeB.GetLinkNodeBuilder(1)})
+	linkBuilderB := gons3.LinkPorts(nodeA.Ports[1], nodeB.Ports[1])
 	createdLinkB, err := gons3.CreateLink(client, project.ProjectID, linkBuilderB)
 	if err != nil {
 		t.Fatalf("Error creating linkB: %v", err)
@@ -193,8 +188,7 @@ func TestDeleteLink(t *testing.T) {
 		t.Fatalf("Error creating nodeB: %v", err)
 	}
 
-	linkBuilder := gons3.LinkBuilder{}
-	linkBuilder.SetNodes([]gons3.LinkNodeBuilder{nodeA.GetLinkNodeBuilder(0), nodeB.GetLinkNodeBuilder(0)})
+	linkBuilder := gons3.LinkPorts(nodeA.Ports[0], nodeB.Ports[0])
 	createdLink, err := gons3.CreateLink(client, project.ProjectID, linkBuilder)
 	if err != nil {
 		t.Fatalf("Error creating link: %v", err)

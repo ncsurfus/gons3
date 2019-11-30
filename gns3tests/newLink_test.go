@@ -32,14 +32,14 @@ func TestCreateLinkA(t *testing.T) {
 		t.Fatalf("Error creating nodeB: %v", err)
 	}
 
-	LinkNodeBuilderA := nodeA.GetLinkNodeBuilder(0)
+	LinkNodeBuilderA := nodeA.Ports[0].GetLinkNodeBuilder()
 	LinkNodeBuilderA.SetLabelX(5)
 	LinkNodeBuilderA.SetLabelY(6)
 	LinkNodeBuilderA.SetLabelRotation(90)
 	LinkNodeBuilderA.SetLabelStyle("font-family: Verdana;")
 	LinkNodeBuilderA.SetLabelText("PortA")
 
-	LinkNodeBuilderB := nodeB.GetLinkNodeBuilder(0)
+	LinkNodeBuilderB := nodeB.Ports[0].GetLinkNodeBuilder()
 	LinkNodeBuilderB.SetLabelX(7)
 	LinkNodeBuilderB.SetLabelY(8)
 	LinkNodeBuilderB.SetLabelRotation(180)
@@ -48,7 +48,7 @@ func TestCreateLinkA(t *testing.T) {
 	linkBuilder := gons3.LinkBuilder{}
 	linkBuilder.SetLinkType("ethernet")
 	linkBuilder.SetSuspend(false)
-	linkBuilder.SetNodes([]gons3.LinkNodeBuilder{LinkNodeBuilderA, LinkNodeBuilderB})
+	linkBuilder.SetNodes(LinkNodeBuilderA, LinkNodeBuilderB)
 	link, err := gons3.CreateLink(client, project.ProjectID, linkBuilder)
 	if err != nil {
 		t.Fatalf("Error creating link: %v", err)
